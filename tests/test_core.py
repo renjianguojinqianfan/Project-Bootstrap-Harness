@@ -63,6 +63,15 @@ def test_init_project_creates_pyproject_toml(tmp_path: Path) -> None:
     assert 'name = "test-project"' in content
 
 
+def test_init_project_creates_readme(tmp_path: Path) -> None:
+    """应生成 README.md 并包含项目名。"""
+    project_path = tmp_path / "test-project"
+    init_project(str(project_path))
+    readme = project_path / "README.md"
+    assert readme.exists()
+    assert "test-project" in readme.read_text(encoding="utf-8")
+
+
 def test_init_project_creates_source_files(tmp_path: Path) -> None:
     """应生成初始源码和测试文件。"""
     project_path = tmp_path / "test-project"

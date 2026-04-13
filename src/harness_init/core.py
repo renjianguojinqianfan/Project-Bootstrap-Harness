@@ -62,6 +62,7 @@ def _copy_templates(project_path: Path, project_name: str) -> None:
         ".gitignore": ".gitignore",
         "opencode.yaml": "opencode.yaml",
         "pyproject.toml": "pyproject.toml",
+        "README.md": "README.md",
     }
     for src_name, dst_name in files.items():
         src = templates_dir / src_name

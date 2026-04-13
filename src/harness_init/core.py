@@ -80,7 +80,18 @@ def _create_source_files(project_path: Path, project_name: str) -> None:
     init_file.write_text(f'"""{package_name} package."""\n\n__version__ = "0.1.0"\n', encoding="utf-8")
 
     cli_file = src_dir / "cli.py"
-    cli_content = f'"""CLI entry for {package_name}."""\n\nimport typer\n\napp = typer.Typer()\n\n\n@app.command()\ndef hello() -\u003e None:\n    """Say hello."""\n    typer.echo("Hello from {project_name}!")\n\n\ndef cli() -\u003e None:\n    """CLI entry point."""\n    app()\n\n\nif __name__ == "__main__":\n    cli()\n'
+    cli_content = (
+        f'"""CLI entry for {package_name}."""\n\n'
+        f"import typer\n\n\n"
+        f"def hello() -> None:\n"
+        f'    """Say hello."""\n'
+        f'    typer.echo("Hello from {project_name}!")\n\n\n'
+        f"def cli() -> None:\n"
+        f'    """CLI entry point."""\n'
+        f"    typer.run(hello)\n\n\n"
+        f'if __name__ == "__main__":\n'
+        f"    cli()\n"
+    )
     cli_file.write_text(cli_content, encoding="utf-8")
 
     tests_dir = project_path / "tests"
@@ -92,22 +103,20 @@ def _create_source_files(project_path: Path, project_name: str) -> None:
         f"import runpy\n"
         f"import sys\n"
         f"from unittest.mock import patch\n\n"
-        f"from typer.testing import CliRunner\n\n"
-        f"from {package_name}.cli import app, cli\n\n"
-        f"runner = CliRunner()\n\n\n"
-        f"def test_hello() -\u003e None:\n"
-        f'    """hello 命令应输出问候语。"""\n'
-        f"    result = runner.invoke(app)\n"
-        f"    assert result.exit_code == 0\n"
-        f'    assert "Hello from {project_name}!" in result.output\n\n\n'
-        f"def test_cli_without_args() -\u003e None:\n"
+        f"from {package_name}.cli import cli, hello\n\n\n"
+        f"def test_hello(capsys) -> None:\n"
+        f'    """hello 应输出问候语。"""\n'
+        f"    hello()\n"
+        f"    captured = capsys.readouterr()\n"
+        f'    assert "Hello from {project_name}!" in captured.out\n\n\n'
+        f"def test_cli_without_args() -> None:\n"
         f'    """cli 不带参数时应正常执行并退出。"""\n'
         f'    with patch.object(sys, "argv", [sys.executable]):\n'
         f"        try:\n"
         f"            cli()\n"
         f"        except SystemExit as exc:\n"
         f"            assert exc.code == 0\n\n\n"
-        f"def test_cli_main_block() -\u003e None:\n"
+        f"def test_cli_main_block() -> None:\n"
         f'    """覆盖 if __name__ == "__main__" 分支。"""\n'
         f'    with patch.object(sys, "argv", ["{project_name}"]):\n'
         f"        try:\n"

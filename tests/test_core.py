@@ -82,6 +82,25 @@ def test_init_project_creates_source_files(tmp_path: Path) -> None:
     assert (project_path / "tests" / "test_cli.py").exists()
 
 
+def test_init_project_generated_cli_uses_typer_run(tmp_path: Path) -> None:
+    """生成的 cli.py 应使用 typer.run 模式。"""
+    project_path = tmp_path / "test-project"
+    init_project(str(project_path))
+    content = (project_path / "src" / "test_project" / "cli.py").read_text(encoding="utf-8")
+    assert "typer.run(hello)" in content
+    assert "app = typer.Typer()" not in content
+
+
+def test_init_project_generated_test_cli_matches(tmp_path: Path) -> None:
+    """生成的 test_cli.py 应与 typer.run 模式匹配。"""
+    project_path = tmp_path / "test-project"
+    init_project(str(project_path))
+    content = (project_path / "tests" / "test_cli.py").read_text(encoding="utf-8")
+    assert "from test_project.cli import cli, hello" in content
+    assert "capsys" in content
+    assert "runner.invoke(app)" not in content
+
+
 def test_init_project_git_identity(tmp_path: Path) -> None:
     """应在本地 Git 配置中设置 user.name 和 user.email。"""
     project_path = tmp_path / "test-project"

@@ -1,7 +1,7 @@
 # AGENTS.md - harness-init
 
 ## 项目目标
-构建 `harness-init` CLI 工具，用于快速初始化符合 Harness Engineering 规范的空项目。
+构建 `harness-init` CLI 工具，用于快速初始化符合 Harness Engineering 规范的**完整可运行 Python CLI 项目**（非空壳，生成后即可 `make verify` 通过）。
 
 ## 技术栈
 - Python 3.11+
@@ -38,10 +38,17 @@ tests/              # 单元测试，与 src 结构对应
 - 每完成一个子任务，必须运行 `make verify` 验证
 - 测试覆盖率不达标时禁止提交
 
+## 关键实现细节
+- 生成的项目 CLI 使用 `typer.run(hello)` 单命令模式，避免 `typer.Typer()` 在单命令时被压平的问题
+- `core.py` 使用 `textwrap.dedent` 管理多行模板字符串，避免 E501 超长行
+- `_init_git()` 会自动配置本地 `user.name` 和 `user.email`，不依赖全局 Git 配置
+- 模板目录 `src/harness_init/templates/` 已被根 `pyproject.toml` 的 ruff 配置排除
+
 ## 环境要求
 - 首次开发前必须执行：`pip install -e .`（或 `make install`）
 - 系统中必须安装 `git`，`core.py` 会调用 `git init` 和 `git commit`
-- `make` 在 Windows 上非默认自带，若不可用可运行等价命令：
+- Windows 下若缺少 `make`，可通过 `winget install --id GnuWin32.Make` 安装
+- Windows 下 `make` 不可用时，可运行等价命令：
   - `ruff check src/`
   - `pytest tests/ -v --cov=src --cov-fail-under=85`
 

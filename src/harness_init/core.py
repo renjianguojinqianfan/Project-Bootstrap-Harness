@@ -3,6 +3,7 @@
 import re
 import subprocess
 from pathlib import Path
+from textwrap import dedent
 
 
 def _get_templates_dir() -> Path:
@@ -71,60 +72,87 @@ def _copy_templates(project_path: Path, project_name: str) -> None:
             _render_template(src, dst, project_name)
 
 
+def _gen_cli_py(project_name: str, package_name: str) -> str:
+    """生成 cli.py 内容。"""
+    return dedent(
+        f'''\
+        """CLI entry for {package_name}."""
+
+        import typer
+
+
+        def hello() -> None:
+            """Say hello."""
+            typer.echo("Hello from {project_name}!")
+
+
+        def cli() -> None:
+            """CLI entry point."""
+            typer.run(hello)
+
+
+        if __name__ == "__main__":
+            cli()
+        '''
+    )
+
+
+def _gen_test_cli_py(project_name: str, package_name: str) -> str:
+    """生成 test_cli.py 内容。"""
+    return dedent(
+        f'''\
+        """Tests for cli.py."""
+
+        import runpy
+        import sys
+        from unittest.mock import patch
+
+        from {package_name}.cli import cli, hello
+
+
+        def test_hello(capsys) -> None:
+            """hello 应输出问候语。"""
+            hello()
+            captured = capsys.readouterr()
+            assert "Hello from {project_name}!" in captured.out
+
+
+        def test_cli_without_args() -> None:
+            """cli 不带参数时应正常执行并退出。"""
+            with patch.object(sys, "argv", [sys.executable]):
+                try:
+                    cli()
+                except SystemExit as exc:
+                    assert exc.code == 0
+
+
+        def test_cli_main_block() -> None:
+            """覆盖 if __name__ == '__main__' 分支。"""
+            with patch.object(sys, "argv", ["{project_name}"]):
+                try:
+                    runpy.run_module("{package_name}.cli", run_name="__main__")
+                except SystemExit as exc:
+                    assert exc.code == 0
+        '''
+    )
+
+
 def _create_source_files(project_path: Path, project_name: str) -> None:
     """创建初始 Python 源码和测试文件。"""
     package_name = _to_package_name(project_name)
     src_dir = project_path / "src" / package_name
 
     init_file = src_dir / "__init__.py"
-    init_file.write_text(f'"""{package_name} package."""\n\n__version__ = "0.1.0"\n', encoding="utf-8")
-
-    cli_file = src_dir / "cli.py"
-    cli_content = (
-        f'"""CLI entry for {package_name}."""\n\n'
-        f"import typer\n\n\n"
-        f"def hello() -> None:\n"
-        f'    """Say hello."""\n'
-        f'    typer.echo("Hello from {project_name}!")\n\n\n'
-        f"def cli() -> None:\n"
-        f'    """CLI entry point."""\n'
-        f"    typer.run(hello)\n\n\n"
-        f'if __name__ == "__main__":\n'
-        f"    cli()\n"
+    init_file.write_text(
+        f'"""{package_name} package."""\n\n__version__ = "0.1.0"\n',
+        encoding="utf-8",
     )
-    cli_file.write_text(cli_content, encoding="utf-8")
+
+    (src_dir / "cli.py").write_text(_gen_cli_py(project_name, package_name), encoding="utf-8")
 
     tests_dir = project_path / "tests"
     (tests_dir / "__init__.py").write_text("", encoding="utf-8")
-
-    test_file = tests_dir / "test_cli.py"
-    test_content = (
-        f'"""Tests for cli.py."""\n\n'
-        f"import runpy\n"
-        f"import sys\n"
-        f"from unittest.mock import patch\n\n"
-        f"from {package_name}.cli import cli, hello\n\n\n"
-        f"def test_hello(capsys) -> None:\n"
-        f'    """hello 应输出问候语。"""\n'
-        f"    hello()\n"
-        f"    captured = capsys.readouterr()\n"
-        f'    assert "Hello from {project_name}!" in captured.out\n\n\n'
-        f"def test_cli_without_args() -> None:\n"
-        f'    """cli 不带参数时应正常执行并退出。"""\n'
-        f'    with patch.object(sys, "argv", [sys.executable]):\n'
-        f"        try:\n"
-        f"            cli()\n"
-        f"        except SystemExit as exc:\n"
-        f"            assert exc.code == 0\n\n\n"
-        f"def test_cli_main_block() -> None:\n"
-        f'    """覆盖 if __name__ == "__main__" 分支。"""\n'
-        f'    with patch.object(sys, "argv", ["{project_name}"]):\n'
-        f"        try:\n"
-        f'            runpy.run_module("{package_name}.cli", run_name="__main__")\n'
-        f"        except SystemExit as exc:\n"
-        f"            assert exc.code == 0\n"
-    )
-    test_file.write_text(test_content, encoding="utf-8")
+    (tests_dir / "test_cli.py").write_text(_gen_test_cli_py(project_name, package_name), encoding="utf-8")
 
 
 def _git(project_path: Path, *args: str) -> None:

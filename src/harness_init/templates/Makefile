@@ -1,10 +1,13 @@
-.PHONY: verify test lint
+.PHONY: verify test lint install
 
-verify:
-	@echo "项目结构检查通过"
-
-lint:
-	@echo "lint 跳过（暂无代码）"
+verify: lint test
+	@echo "验证通过"
 
 test:
-	@echo "test 跳过（暂无代码）"
+	pytest tests/ -v --cov=src --cov-fail-under=85
+
+lint:
+	ruff check src/ tests/
+
+install:
+	pip install -e ".[dev]"

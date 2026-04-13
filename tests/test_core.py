@@ -19,7 +19,7 @@ def test_init_project_creates_subdirectories(tmp_path: Path) -> None:
     assert (project_path / ".agent").is_dir()
     assert (project_path / ".agent" / "plans").is_dir()
     assert (project_path / "specs").is_dir()
-    assert (project_path / "src").is_dir()
+    assert (project_path / "src" / "test_project").is_dir()
     assert (project_path / "tests").is_dir()
 
 
@@ -51,6 +51,26 @@ def test_init_project_creates_opencode_yaml(tmp_path: Path) -> None:
     project_path = tmp_path / "test-project"
     init_project(str(project_path))
     assert (project_path / "opencode.yaml").exists()
+
+
+def test_init_project_creates_pyproject_toml(tmp_path: Path) -> None:
+    """应生成 pyproject.toml 并包含项目名。"""
+    project_path = tmp_path / "test-project"
+    init_project(str(project_path))
+    pyproject = project_path / "pyproject.toml"
+    assert pyproject.exists()
+    content = pyproject.read_text(encoding="utf-8")
+    assert 'name = "test-project"' in content
+
+
+def test_init_project_creates_source_files(tmp_path: Path) -> None:
+    """应生成初始源码和测试文件。"""
+    project_path = tmp_path / "test-project"
+    init_project(str(project_path))
+    assert (project_path / "src" / "test_project" / "__init__.py").exists()
+    assert (project_path / "src" / "test_project" / "cli.py").exists()
+    assert (project_path / "tests" / "__init__.py").exists()
+    assert (project_path / "tests" / "test_cli.py").exists()
 
 
 def test_init_project_initializes_git(tmp_path: Path) -> None:

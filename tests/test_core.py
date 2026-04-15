@@ -180,14 +180,17 @@ def test_init_project_fails_on_existing_non_empty_dir(tmp_path: Path) -> None:
         init_project(str(project_path))
 
 
-def test_init_project_force_overwrites_existing_dir(tmp_path: Path) -> None:
-    """指定 force 时应覆盖已存在目录。"""
+def test_init_project_force_backs_up_existing_dir(tmp_path: Path) -> None:
+    """指定 force 时应备份已存在目录而非直接删除。"""
     project_path = tmp_path / "existing"
     project_path.mkdir()
     (project_path / "old.txt").write_text("old")
     init_project(str(project_path), force=True)
     assert not (project_path / "old.txt").exists()
     assert (project_path / "pyproject.toml").exists()
+    backups = [p for p in tmp_path.iterdir() if p.name.startswith("existing.bak-")]
+    assert len(backups) == 1
+    assert (backups[0] / "old.txt").exists()
 
 
 def test_init_project_no_git_skips_git(tmp_path: Path) -> None:

@@ -4,6 +4,7 @@ import os
 import re
 import stat
 import subprocess
+from datetime import UTC, datetime
 from pathlib import Path
 
 
@@ -44,8 +45,20 @@ def _ensure_dir(path: Path) -> None:
     path.mkdir(parents=True, exist_ok=True)
 
 
-def _render_template(template_path: Path, output_path: Path, project_name: str) -> None:
-    """渲染模板文件到目标路径。"""
+def _is_binary(path: Path) -> bool:
+    """判断文件是否为二进制文件。"""
+    with open(path, "rb") as f:
+        chunk = f.read(8192)
+        return b"\x00" in chunk
+
+
+def _copy_or_render_template(template_path: Path, output_path: Path, project_name: str) -> None:
+    """渲染模板文件到目标路径；二进制文件直接复制。"""
+    if _is_binary(template_path):
+        import shutil
+
+        shutil.copy2(template_path, output_path)
+        return
     package_name = _to_package_name(project_name)
     pep508_name = _to_pep508_name(project_name)
     replacements = {
@@ -112,7 +125,7 @@ def _copy_templates(project_path: Path, project_name: str) -> None:
         rel_str = str(rel).replace("{package_name}", package_name)
         dst = project_path / rel_str
         dst.parent.mkdir(parents=True, exist_ok=True)
-        _render_template(src, dst, project_name)
+        _copy_or_render_template(src, dst, project_name)
         dst.chmod(src.stat().st_mode)
 
 
@@ -170,7 +183,9 @@ def init_project(project_path: str, *, force: bool = False, no_git: bool = False
     if force and path.exists():
         import shutil
 
-        shutil.rmtree(path, onexc=_on_remove_error)
+        suffix = datetime.now(UTC).strftime(".bak-%Y%m%d%H%M%S")
+        backup_path = path.with_name(path.name + suffix)
+        shutil.move(str(path), str(backup_path))
     _create_directories(path, project_name)
     _copy_templates(path, project_name)
     _create_source_files(path, project_name)

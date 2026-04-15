@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+import shlex
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
@@ -61,11 +62,7 @@ class HarnessRunner:
         task.status = TaskStatus.RUNNING
 
         try:
-            proc = await asyncio.create_subprocess_shell(
-                task.command,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
-            )
+            proc = await self._spawn_subprocess(task.command)
             stdout, stderr = await proc.communicate()
             task.output = stdout.decode("utf-8", errors="replace").strip()
             task.error = stderr.decode("utf-8", errors="replace").strip()
@@ -81,6 +78,28 @@ class HarnessRunner:
             "output": task.output,
             "error": task.error,
         }
+
+    async def _spawn_subprocess(self, command: str) -> asyncio.subprocess.Process:
+        """优先尝试无 shell 执行，失败时回退到 shell。"""
+        try:
+            cmd_parts = shlex.split(command)
+        except ValueError:
+            cmd_parts = []
+        if cmd_parts:
+            try:
+                return await asyncio.create_subprocess_exec(
+                    cmd_parts[0],
+                    *cmd_parts[1:],
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.PIPE,
+                )
+            except (FileNotFoundError, OSError):
+                pass
+        return await asyncio.create_subprocess_shell(
+            command,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
 
 
 if __name__ == "__main__":

@@ -1,6 +1,8 @@
 """Simple JSON state manager."""
 
 import json
+import os
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -24,10 +26,19 @@ class StateManager:
         return self._data
 
     def save(self) -> None:
-        """Save state to disk."""
+        """原子方式保存状态到磁盘。"""
         self.state_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(self.state_path, "w", encoding="utf-8") as f:
-            json.dump(self._data, f, indent=2)
+        fd, tmp_path_str = tempfile.mkstemp(dir=self.state_path.parent, suffix=".tmp")
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8") as f:
+                json.dump(self._data, f, indent=2)
+            os.replace(tmp_path_str, self.state_path)
+        except Exception:
+            try:
+                os.unlink(tmp_path_str)
+            except OSError:
+                pass
+            raise
 
     def get(self, key: str, default: Any | None = None) -> Any:
         """Get a value by key."""

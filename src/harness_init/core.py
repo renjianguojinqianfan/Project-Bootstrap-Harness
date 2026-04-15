@@ -91,9 +91,7 @@ def _should_skip(path: Path) -> bool:
         return True
     if any(part in _IGNORED_NAMES for part in path.parts):
         return True
-    if path.name.endswith(_IGNORED_SUFFIXES):
-        return True
-    return False
+    return path.name.endswith(_IGNORED_SUFFIXES)
 
 
 def _copy_templates(project_path: Path, project_name: str) -> None:

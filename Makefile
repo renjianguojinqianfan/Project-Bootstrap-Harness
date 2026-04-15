@@ -10,4 +10,4 @@ lint:
 	ruff check src/
 
 install:
-	pip install -e .
+	pip install -e ".[dev]"

@@ -12,6 +12,7 @@
 - Decomposes user requests into atomic tasks
 - Produces JSON plans saved to `.harness/plans/`
 - Defines acceptance criteria and task dependencies
+- Uses `shlex.quote` for safe command generation
 
 ### Generator
 - Executes individual plan tasks
@@ -42,6 +43,8 @@ graph LR
 - **Test coverage**: >= 85%, enforced by `pytest-cov`
 - **Function length**: <= 30 lines
 - **File length**: <= 200 lines
+- **Command execution**: Runner prefers `create_subprocess_exec`; falls back to `shell` only when necessary
+- **State safety**: `StateManager` uses atomic write-then-rename to avoid JSON corruption
 - **Documentation separation**: `AGENTS.md` is the map; `docs/context.md` holds deep context
 - **Verification gate**: `make verify` must pass before any commit
 

@@ -196,3 +196,11 @@ def test_init_project_git_failure_rolls_back(tmp_path: Path) -> None:
         with pytest.raises(RuntimeError, match="Git initialization failed"):
             init_project(str(project_path))
     assert not project_path.exists()
+
+
+def test_init_project_skips_cache_files(tmp_path: Path) -> None:
+    """不应把缓存文件复制到生成项目中。"""
+    project_path = tmp_path / "clean-project"
+    init_project(str(project_path))
+    for bad in [".DS_Store", "__pycache__", "foo.pyc"]:
+        assert not any(f.name == bad for f in project_path.rglob("*"))

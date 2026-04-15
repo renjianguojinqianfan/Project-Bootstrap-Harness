@@ -41,10 +41,14 @@ def _render_template(template_path: Path, output_path: Path, project_name: str) 
     """渲染模板文件到目标路径。"""
     package_name = _to_package_name(project_name)
     pep508_name = _to_pep508_name(project_name)
+    replacements = {
+        "{project_name}": project_name,
+        "{package_name}": package_name,
+        "{pep508_name}": pep508_name,
+    }
     content = template_path.read_text(encoding="utf-8")
-    content = content.replace("{project_name}", project_name)
-    content = content.replace("{package_name}", package_name)
-    content = content.replace("{pep508_name}", pep508_name)
+    for placeholder, value in replacements.items():
+        content = content.replace(placeholder, value)
     output_path.write_text(content, encoding="utf-8")
 
 
@@ -70,18 +74,41 @@ def _create_directories(project_path: Path, project_name: str) -> None:
         _ensure_dir(project_path / d)
 
 
+_IGNORED_NAMES = {
+    ".ruff_cache",
+    "__pycache__",
+    ".DS_Store",
+    ".git",
+    ".pytest_cache",
+    ".mypy_cache",
+}
+_IGNORED_SUFFIXES = (".pyc", ".pyo", ".swp", "~")
+
+
+def _should_skip(path: Path) -> bool:
+    """判断模板路径是否应被跳过。"""
+    if not path.is_file():
+        return True
+    if any(part in _IGNORED_NAMES for part in path.parts):
+        return True
+    if path.name.endswith(_IGNORED_SUFFIXES):
+        return True
+    return False
+
+
 def _copy_templates(project_path: Path, project_name: str) -> None:
     """复制模板文件到项目目录（递归）。"""
     templates_dir = _get_templates_dir()
     package_name = _to_package_name(project_name)
     for src in templates_dir.rglob("*"):
-        if not src.is_file() or ".ruff_cache" in src.parts:
+        if _should_skip(src):
             continue
         rel = src.relative_to(templates_dir)
         rel_str = str(rel).replace("{package_name}", package_name)
         dst = project_path / rel_str
         dst.parent.mkdir(parents=True, exist_ok=True)
         _render_template(src, dst, project_name)
+        dst.chmod(src.stat().st_mode)
 
 
 def _create_source_files(project_path: Path, project_name: str) -> None:

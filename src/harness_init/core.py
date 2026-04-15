@@ -1,6 +1,8 @@
 """Core logic for harness-init."""
 
+import os
 import re
+import stat
 import subprocess
 from pathlib import Path
 
@@ -16,6 +18,11 @@ def _validate_project_name(project_name: str) -> None:
         raise ValueError("Project name cannot be empty.")
     if any(c in project_name for c in ("/", "\\", "..")):
         raise ValueError("Project name cannot contain path separators or '..'.")
+    if not re.match(r"^[a-zA-Z_][a-zA-Z0-9_-]*$", project_name):
+        raise ValueError(
+            "Project name must start with a letter or underscore "
+            "and contain only letters, digits, hyphens, and underscores."
+        )
 
 
 def _to_package_name(project_name: str) -> str:
@@ -136,6 +143,15 @@ def _init_git(project_path: Path) -> None:
     _git(project_path, "commit", "-m", "Initial commit")
 
 
+def _on_remove_error(_func: object, path: str, _exc_info: object) -> None:
+    """Windows 下删除只读文件时的回调。"""
+    os.chmod(path, stat.S_IWRITE)
+    if os.path.isdir(path) and not os.path.islink(path):
+        os.rmdir(path)
+    else:
+        os.unlink(path)
+
+
 def init_project(project_path: str, *, force: bool = False, no_git: bool = False) -> None:
     """初始化新项目。
 
@@ -154,7 +170,7 @@ def init_project(project_path: str, *, force: bool = False, no_git: bool = False
     if force and path.exists():
         import shutil
 
-        shutil.rmtree(path)
+        shutil.rmtree(path, onexc=_on_remove_error)
     _create_directories(path, project_name)
     _copy_templates(path, project_name)
     _create_source_files(path, project_name)
@@ -164,5 +180,5 @@ def init_project(project_path: str, *, force: bool = False, no_git: bool = False
         except Exception as exc:
             import shutil
 
-            shutil.rmtree(path)
+            shutil.rmtree(path, onexc=_on_remove_error)
             raise RuntimeError(f"Git initialization failed: {exc}") from exc

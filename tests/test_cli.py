@@ -8,15 +8,17 @@ import typer
 from typer.testing import CliRunner
 
 from harness_init.cli import cli, main
-from harness_init.core import init_project
 
 runner = CliRunner()
 
 
 def test_main_creates_project(tmp_path: Path) -> None:
     """应能根据项目名创建完整的 Harness v2 项目。"""
+    app = typer.Typer()
+    app.command()(main)
     project_path = tmp_path / "my-project"
-    init_project(str(project_path))
+    result = runner.invoke(app, [str(project_path)])
+    assert result.exit_code == 0
     assert project_path.is_dir()
     assert (project_path / ".git").is_dir()
     assert (project_path / ".harness" / "plans").is_dir()

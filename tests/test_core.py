@@ -159,6 +159,18 @@ def test_init_project_rejects_path_traversal(tmp_path: Path) -> None:
         init_project("foo/../bar")
 
 
+def test_init_project_rejects_space_in_name(tmp_path: Path) -> None:
+    """应拒绝包含空格的项目名。"""
+    with pytest.raises(ValueError, match="must start with a letter"):
+        init_project("my project")
+
+
+def test_init_project_rejects_leading_digit(tmp_path: Path) -> None:
+    """应拒绝以数字开头的项目名。"""
+    with pytest.raises(ValueError, match="must start with a letter"):
+        init_project("123project")
+
+
 def test_init_project_fails_on_existing_non_empty_dir(tmp_path: Path) -> None:
     """非空目录已存在且未指定 force 时应报错。"""
     project_path = tmp_path / "existing"

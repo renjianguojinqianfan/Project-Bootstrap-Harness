@@ -24,8 +24,11 @@ tech_stack:
 ├── tests/                       # Unit and integration tests
 ├── .harness/                    # Harness runtime artifacts
 │   ├── plans/                   # JSON execution plans
-│   └── eval_feedback/           # Evaluation reports
-├── docs/context.md              # Deep context (this file)
+│   ├── eval_feedback/           # Evaluation reports
+│   └── progress.json            # Source of truth for session state
+├── docs/
+│   ├── context.md               # Deep context (this file)
+│   └── decisions/               # Architecture decision records (ADR)
 └── AGENTS.md                    # Quick agent map
 ```
 
@@ -99,10 +102,12 @@ make verify
 |------|---------|
 | `AGENTS.md` | Agent quick-reference map (50-100 lines) |
 | `docs/context.md` | Deep project context (this file) |
+| `docs/decisions/` | Architecture decision records (ADR) |
 | `src/{package_name}/agents/` | Agent implementations |
 | `src/{package_name}/harness/runner.py` | Plan execution engine |
 | `src/{package_name}/harness/evaluator.py` | Result evaluation engine |
 | `.harness/plans/` | JSON execution plans |
+| `.harness/progress.json` | Session state source of truth |
 | `.harness/eval_feedback/` | Evaluation output |
 | `tests/` | Test suites |
 | `Makefile` | `make verify`, `make test`, `make lint` |

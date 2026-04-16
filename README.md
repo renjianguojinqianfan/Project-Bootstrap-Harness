@@ -40,10 +40,10 @@ make verify
 - 完整的 Python 包结构（`src/my_project/`）
 - Harness 核心引擎：`runner.py`（任务执行）、`evaluator.py`（结果评估）、`state.py`（状态持久化）、`workflow.py`（工作流定义）
 - Agent stubs：`planner.py`、`generator.py`、`evaluator.py`
-- 运行时目录：`.harness/plans/`、`.harness/eval_feedback/`、`.harness/state/`
+- 运行时目录：`.harness/plans/`、`.harness/eval_feedback/`、`.harness/state/`、`.harness/progress.json`
 - 多命令 CLI：`run`、`evaluate`、`status`
-- `configs/`（dev/test/prod）、`docs/context.md`、`AGENTS.md`、`opencode.yaml`
-- `pyproject.toml`、`Makefile`、`.gitignore`
+- `configs/`（dev/test/prod）、`docs/context.md`、`docs/decisions/`、`AGENTS.md`、`opencode.yaml`
+- `pyproject.toml`、`Makefile`、`.gitignore`、`README.md`、`README.en.md`
 - 自动初始化的 Git 仓库和初始提交
 
 ## CLI 选项
@@ -93,6 +93,8 @@ harness-init my-project --no-git
 
 - `src/harness_init/cli.py` — CLI 入口（参数解析）
 - `src/harness_init/core.py` — 项目生成核心逻辑（校验、复制、渲染、Git 初始化、回滚）
+- `src/harness_init/_utils.py` — 名称验证、模板渲染等辅助函数
+- `src/harness_init/_git.py` — Git 初始化与回滚辅助函数
 - `src/harness_init/templates/` — 目标项目的模板文件
 
 ## 许可证

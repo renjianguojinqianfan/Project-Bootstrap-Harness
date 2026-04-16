@@ -52,7 +52,14 @@ def _is_binary(path: Path) -> bool:
         return b"\x00" in chunk
 
 
-def _copy_or_render_template(template_path: Path, output_path: Path, project_name: str) -> None:
+def _copy_or_render_template(
+    template_path: Path,
+    output_path: Path,
+    project_name: str,
+    description: str = "",
+    author: str = "",
+    email: str = "",
+) -> None:
     """渲染模板文件到目标路径；二进制文件直接复制。"""
     if _is_binary(template_path):
         import shutil
@@ -65,6 +72,9 @@ def _copy_or_render_template(template_path: Path, output_path: Path, project_nam
         "{project_name}": project_name,
         "{package_name}": package_name,
         "{pep508_name}": pep508_name,
+        "{project_description}": description,
+        "{author_name}": author,
+        "{author_email}": email,
     }
     content = template_path.read_text(encoding="utf-8")
     for placeholder, value in replacements.items():
@@ -114,7 +124,13 @@ def _should_skip(path: Path) -> bool:
     return path.name.endswith(_IGNORED_SUFFIXES)
 
 
-def _copy_templates(project_path: Path, project_name: str) -> None:
+def _copy_templates(
+    project_path: Path,
+    project_name: str,
+    description: str = "",
+    author: str = "",
+    email: str = "",
+) -> None:
     """复制模板文件到项目目录（递归）。"""
     templates_dir = _get_templates_dir()
     package_name = _to_package_name(project_name)
@@ -125,7 +141,7 @@ def _copy_templates(project_path: Path, project_name: str) -> None:
         rel_str = str(rel).replace("{package_name}", package_name)
         dst = project_path / rel_str
         dst.parent.mkdir(parents=True, exist_ok=True)
-        _copy_or_render_template(src, dst, project_name)
+        _copy_or_render_template(src, dst, project_name, description, author, email)
         dst.chmod(src.stat().st_mode)
 
 
@@ -149,11 +165,11 @@ def _git(project_path: Path, *args: str) -> None:
         raise RuntimeError(f"git {' '.join(args)} failed: {result.stderr.strip()}")
 
 
-def _init_git(project_path: Path) -> None:
+def _init_git(project_path: Path, author: str = "", email: str = "") -> None:
     """初始化 Git 仓库并创建初始提交。"""
     _git(project_path, "init")
-    _git(project_path, "config", "user.email", "harness-init@localhost")
-    _git(project_path, "config", "user.name", "harness-init")
+    _git(project_path, "config", "user.email", email or "harness-init@localhost")
+    _git(project_path, "config", "user.name", author or "harness-init")
     _git(project_path, "add", ".")
     _git(project_path, "commit", "-m", "Initial commit")
 
@@ -167,13 +183,24 @@ def _on_remove_error(_func: object, path: str, _exc_info: object) -> None:
         os.unlink(path)
 
 
-def init_project(project_path: str, *, force: bool = False, no_git: bool = False) -> None:
+def init_project(
+    project_path: str,
+    *,
+    force: bool = False,
+    no_git: bool = False,
+    description: str = "",
+    author: str = "",
+    email: str = "",
+) -> None:
     """初始化新项目。
 
     Args:
         project_path: 项目目标路径。
         force: 是否强制覆盖已存在目录。
         no_git: 是否跳过 Git 初始化。
+        description: 项目描述。
+        author: 作者名。
+        email: 作者邮箱。
     """
     path = Path(project_path)
     project_name = path.name
@@ -189,11 +216,11 @@ def init_project(project_path: str, *, force: bool = False, no_git: bool = False
         backup_path = path.with_name(path.name + suffix)
         shutil.move(str(path), str(backup_path))
     _create_directories(path, project_name)
-    _copy_templates(path, project_name)
+    _copy_templates(path, project_name, description, author, email)
     _create_source_files(path, project_name)
     if not no_git:
         try:
-            _init_git(path)
+            _init_git(path, author, email)
         except Exception as exc:
             import shutil
 

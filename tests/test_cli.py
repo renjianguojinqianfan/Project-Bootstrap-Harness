@@ -17,7 +17,7 @@ def test_main_creates_project(tmp_path: Path) -> None:
     app = typer.Typer()
     app.command()(main)
     project_path = tmp_path / "my-project"
-    result = runner.invoke(app, [str(project_path)])
+    result = runner.invoke(app, [str(project_path)], input="\n\n\n")
     assert result.exit_code == 0
     assert project_path.is_dir()
     assert (project_path / ".git").is_dir()
@@ -48,7 +48,7 @@ def test_cli_no_git_flag(tmp_path: Path) -> None:
     app = typer.Typer()
     app.command()(main)
     project_path = tmp_path / "no-git-cli"
-    result = runner.invoke(app, [str(project_path), "--no-git"])
+    result = runner.invoke(app, [str(project_path), "--no-git"], input="\n\n\n")
     assert result.exit_code == 0
     assert project_path.is_dir()
     assert not (project_path / ".git").exists()
@@ -61,10 +61,39 @@ def test_cli_force_flag(tmp_path: Path) -> None:
     project_path = tmp_path / "force-cli"
     project_path.mkdir()
     (project_path / "old.txt").write_text("old")
-    result = runner.invoke(app, [str(project_path), "--force"])
+    result = runner.invoke(app, [str(project_path), "--force"], input="\n\n\n")
     assert result.exit_code == 0
     assert not (project_path / "old.txt").exists()
     assert (project_path / "pyproject.toml").exists()
+
+
+def test_cli_interactive_prompts(tmp_path: Path) -> None:
+    """交互模式下应提示并注入项目描述到 README。"""
+    app = typer.Typer()
+    app.command()(main)
+    project_path = tmp_path / "interactive-cli"
+    result = runner.invoke(
+        app,
+        [str(project_path)],
+        input="A test project\nAlice\nalice@example.com\n",
+    )
+    assert result.exit_code == 0
+    readme = project_path / "README.md"
+    assert readme.exists()
+    assert "A test project" in readme.read_text(encoding="utf-8")
+
+
+def test_cli_yes_skips_prompts(tmp_path: Path) -> None:
+    """--yes 应跳过所有交互提示。"""
+    app = typer.Typer()
+    app.command()(main)
+    project_path = tmp_path / "yes-cli"
+    result = runner.invoke(app, [str(project_path), "--yes"])
+    assert result.exit_code == 0
+    readme = project_path / "README.md"
+    assert readme.exists()
+    content = readme.read_text(encoding="utf-8")
+    assert "{project_description}" not in content
 
 
 def test_generated_project_passes_make_verify(tmp_path: Path) -> None:

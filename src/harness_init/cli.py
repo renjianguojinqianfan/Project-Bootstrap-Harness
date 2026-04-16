@@ -44,19 +44,19 @@ def main(
         is_eager=True,
         callback=_version_callback,
     ),
-    description: str = typer.Option("", prompt="Project description", help="项目描述。"),
-    author: str = typer.Option("", prompt="Author name", help="作者名。"),
-    email: str = typer.Option("", prompt="Author email", help="作者邮箱。"),
     yes: bool = typer.Option(False, "--yes", "-y", help="跳过交互提示，使用默认值。"),
 ) -> None:
     """初始化一个新的 Harness Engineering 项目。"""
+    description = "" if yes else typer.prompt("Project description", default="")
+    author = "" if yes else typer.prompt("Author name", default="")
+    email = "" if yes else typer.prompt("Author email", default="")
     _run_init(
         project_name,
         force=force,
         no_git=no_git,
-        description="" if yes else description,
-        author="" if yes else author,
-        email="" if yes else email,
+        description=description,
+        author=author,
+        email=email,
     )
 
 

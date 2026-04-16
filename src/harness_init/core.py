@@ -73,8 +73,8 @@ def _copy_or_render_template(
         "{package_name}": package_name,
         "{pep508_name}": pep508_name,
         "{project_description}": description,
-        "{author_name}": author,
-        "{author_email}": email,
+        "{author_name}": author or "harness-init",
+        "{author_email}": email or "harness-init@example.com",
     }
     content = template_path.read_text(encoding="utf-8")
     for placeholder, value in replacements.items():
@@ -168,7 +168,7 @@ def _git(project_path: Path, *args: str) -> None:
 def _init_git(project_path: Path, author: str = "", email: str = "") -> None:
     """初始化 Git 仓库并创建初始提交。"""
     _git(project_path, "init")
-    _git(project_path, "config", "user.email", email or "harness-init@localhost")
+    _git(project_path, "config", "user.email", email or "harness-init@example.com")
     _git(project_path, "config", "user.name", author or "harness-init")
     _git(project_path, "add", ".")
     _git(project_path, "commit", "-m", "Initial commit")

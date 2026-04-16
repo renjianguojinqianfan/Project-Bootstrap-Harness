@@ -135,7 +135,7 @@ def test_init_project_git_identity(tmp_path: Path) -> None:
     project_path = tmp_path / "test-project"
     init_project(str(project_path))
     git_config = (project_path / ".git" / "config").read_text(encoding="utf-8")
-    assert "harness-init@localhost" in git_config
+    assert "harness-init@example.com" in git_config
     assert "harness-init" in git_config
 
 
@@ -329,3 +329,35 @@ def test_init_project_rejects_existing_file(tmp_path: Path) -> None:
     file_path.write_text("hello")
     with pytest.raises(FileExistsError):
         init_project(str(file_path))
+
+
+def test_init_project_injects_metadata(tmp_path: Path) -> None:
+    """应正确将描述、作者和邮箱注入到生成项目的文件和 Git 配置中。"""
+    project_path = tmp_path / "meta-project"
+    init_project(
+        str(project_path),
+        description="A meta project",
+        author="Bob",
+        email="bob@test.com",
+    )
+    readme = project_path / "README.md"
+    assert "A meta project" in readme.read_text(encoding="utf-8")
+    agents_md = project_path / "AGENTS.md"
+    assert "A meta project" in agents_md.read_text(encoding="utf-8")
+    assert "Bob" in agents_md.read_text(encoding="utf-8")
+    pyproject = project_path / "pyproject.toml"
+    content = pyproject.read_text(encoding="utf-8")
+    assert 'name = "Bob"' in content
+    assert 'email = "bob@test.com"' in content
+    git_config = (project_path / ".git" / "config").read_text(encoding="utf-8")
+    assert "bob@test.com" in git_config
+    assert "Bob" in git_config
+
+
+def test_init_project_git_uses_fallback_when_empty(tmp_path: Path) -> None:
+    """传空 author/email 时 Git 配置应回退到默认值。"""
+    project_path = tmp_path / "fallback-project"
+    init_project(str(project_path), description="", author="", email="")
+    git_config = (project_path / ".git" / "config").read_text(encoding="utf-8")
+    assert "harness-init@example.com" in git_config
+    assert "harness-init" in git_config

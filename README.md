@@ -1,5 +1,10 @@
 # harness-init
 
+[![PyPI version](https://badge.fury.io/py/harness-init.svg)](https://badge.fury.io/py/harness-init)
+[![Python Version](https://img.shields.io/pypi/pyversions/harness-init.svg)](https://pypi.org/project/harness-init/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+
 一个 CLI 工具，用于快速初始化符合 **Harness Engineering** 规范的完整 Python 项目。生成的项目不是空壳，而是包含可运行的 Harness 核心引擎、Agent 骨架、测试套件和验证流水线，**生成后即可 `make verify` 通过**。
 
 ## 核心特性
@@ -8,6 +13,8 @@
 - **生成即验证**：每个生成的项目都内置 `make verify`（ruff + pytest，覆盖率 ≥ 85%）
 - **对 Agent 友好**：生成的项目自带 `AGENTS.md`、`docs/context.md`、`opencode.yaml`，外部智能体（如 OpenCode）可以直接理解项目结构和工作流
 - **安全健壮**：项目名校验、路径遍历防护、Git 失败自动回滚、State 原子写入
+- **双语文档**：生成的项目包含中英文 README，便于国际化协作
+- **模块化设计**：生成的 `harness` 核心引擎包含 `runner`、`evaluator`、`state`、`workflow` 等组件，开箱即用
 
 ## 安装
 
@@ -46,21 +53,59 @@ make verify
 - `pyproject.toml`、`Makefile`、`.gitignore`、`README.md`、`README.en.md`
 - 自动初始化的 Git 仓库和初始提交
 
+## 生成的项目结构
+
+```
+my-project/
+├── .harness/                 # Harness 运行时目录
+│   ├── plans/                # 执行计划
+│   ├── eval_feedback/        # 评估反馈
+│   ├── state/                # 状态持久化
+│   ├── templates/            # 模板文件
+│   ├── logs/                 # 运行日志
+│   └── progress.json         # 任务进度
+├── configs/                  # 多环境配置 (dev/test/prod)
+├── docs/                     # 文档
+│   ├── context.md            # Agent 上下文
+│   └── decisions/            # 架构决策记录
+├── src/my_project/           # 主包
+│   ├── __init__.py
+│   ├── cli.py                # CLI 入口
+│   ├── harness/              # 核心引擎
+│   │   ├── runner.py
+│   │   ├── evaluator.py
+│   │   ├── state.py
+│   │   └── workflow.py
+│   ├── agents/               # Agent 骨架
+│   │   ├── planner.py
+│   │   ├── generator.py
+│   │   └── evaluator.py
+│   ├── tools/                # 工具函数
+│   └── utils/                # 通用辅助
+├── tests/                    # 测试
+├── .gitignore
+├── AGENTS.md                 # Agent 操作指南
+├── opencode.yaml             # 工作流配置
+├── Makefile
+├── pyproject.toml
+├── README.md                 # 中文说明
+└── README.en.md              # 英文说明
+```
+
 ## CLI 选项
 
 ```bash
-# 查看版本
-harness-init --version
-
-# 强制覆盖已存在目录（旧目录会被备份为 my-project.bak-YYYYMMDDhhmmss）
-# ⚠️ 警告：--force 会移动整个已存在目录并用模板覆盖，不适合已有代码仓库的增量迁移
-harness-init my-project --force
-
-# 跳过 Git 初始化
-harness-init my-project --no-git
+harness-init [OPTIONS] PROJECT_NAME
 ```
 
-## 项目名规则
+| 选项 | 简写 | 说明 |
+|------|------|------|
+| `--force` | `-f` | 强制覆盖已存在的目录（旧目录自动备份） |
+| `--no-git` | | 跳过 Git 初始化 |
+| `--yes` | `-y` | 跳过所有交互提示，使用默认值 |
+| `--version` | `-v` | 显示版本号 |
+
+### 项目名规则
 
 为了生成合法的 Python 包，项目名必须：
 - 以字母或下划线开头
@@ -99,4 +144,8 @@ harness-init my-project --no-git
 
 ## 许可证
 
-MIT
+MIT License
+
+---
+
+[English Version](README.en.md)

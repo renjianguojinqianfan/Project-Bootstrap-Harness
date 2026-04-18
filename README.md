@@ -1,153 +1,177 @@
-# harness-init
+# 🚀 harness-init
 
 [![PyPI version](https://badge.fury.io/py/harness-init.svg)](https://badge.fury.io/py/harness-init)
 [![Python Version](https://img.shields.io/pypi/pyversions/harness-init.svg)](https://pypi.org/project/harness-init/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
-一个 CLI 工具，用于快速初始化符合 **Harness Engineering** 规范的完整 Python 项目。生成的项目不是空壳，而是包含可运行的 Harness 核心引擎、Agent 骨架、测试套件和验证流水线，**生成后即可 `make verify` 通过**。
+> **为 AI Agent 准备的 Python 项目脚手架。**
+> 不是又一个代码生成器，而是一份任何 AI 工具都能读懂的 **"协作合同"**。
 
-## 核心特性
+---
 
-- **一键生成完整项目**：包结构、CLI、测试、Harness 运行时、Git 初始化，全部自动完成
-- **生成即验证**：每个生成的项目都内置 `make verify`（ruff + pytest，覆盖率 ≥ 85%）
-- **对 Agent 友好**：生成的项目自带增强版 `AGENTS.md`（含 Planner / Generator / Evaluator 三角色强制工作流）、标准计划模板 `.harness/templates/plan_template.md`、状态追踪 `.harness/progress.json`，以及 `docs/context.md`、`opencode.yaml`，外部智能体可以直接理解项目结构和工作流
-- **安全健壮**：项目名校验、路径遍历防护、Git 失败自动回滚、State 原子写入
-- **双语文档**：生成的项目包含中英文 README，便于国际化协作
-- **模块化设计**：生成的 `harness` 核心引擎包含 `runner`、`evaluator`、`state`、`workflow` 等组件，开箱即用
+## 🤔 为什么需要这个工具？
 
-## 安装
+用 Claude Code、Codex、Cursor 写代码时，你是否遇到过这些场景：
+
+- AI 写了代码却不跑测试，小问题滚雪球？
+- 新建一个会话后，AI 完全忘记之前的决策，需要你反复"喂"上下文？
+- 团队里每个人对 AI 的指挥方式不一样，代码风格混乱？
+
+**问题不在于 AI 不够聪明，而在于我们没给它一个清晰、持久、可验证的"工作环境"。**
+
+`harness-init` 在创建项目的第一秒，就把 **AI 的工作说明书、质量门禁和状态管理系统** 种进项目里。从此，任何进入项目的 AI 工具都知道：该按什么流程干活、如何交接任务、以及怎样才算"做完了"。
+
+---
+
+## ✨ 核心特性
+
+- **🤖 Agent 原生设计**：生成的 `AGENTS.md` 定义了 Planner → Generator → Evaluator 三角色强制工作流，让 AI 学会"分工协作"。
+- **✅ 生成即验证**：内置 `make verify` 流水线，强制运行 ruff 代码检查 + pytest 测试，覆盖率门槛 **≥85%**。质量不过关，项目不算生成成功。
+- **🛡️ 约束即代码**：自动提供 Git Hooks 脚本和 GitHub Actions CI 配置（可选），让规范成为不可绕过的硬约束。
+- **📋 标准化的交接协议**：计划模板、进度状态文件、交接摘要，让 AI 即使在新会话中也能"无缝接棒"。
+- **🌍 双语文档**：自动生成中英文 `README.md`，降低国际化团队的协作门槛。
+- **🎯 专注 Python，刻意轻量**：不实现复杂的 Agent 运行时，只做最擅长的事——定义一套通用的协作规范。
+
+---
+
+## 📦 安装
 
 ```bash
 pip install harness-init
 ```
 
-或者从源码安装：
+需要 Python 3.11 或更高版本。
+
+---
+
+## 🚀 快速开始
+
+### 1. 创建新项目
 
 ```bash
-git clone https://github.com/renjianguojinqianfan/Project-Bootstrap-Harness.git
-cd Project-Bootstrap-Harness
+harness-init my-awesome-project
+```
+
+按提示输入项目描述、作者信息（或使用 `--yes` 跳过）。
+
+### 2. 进入项目并安装依赖
+
+```bash
+cd my-awesome-project
 pip install -e ".[dev]"
 ```
 
-## 快速开始
+### 3. 运行验证流水线
 
 ```bash
-# 创建新项目
-harness-init my-project
-
-# 进入并验证
-cd my-project
-pip install -e ".[dev]"
 make verify
 ```
 
-执行后会在当前目录创建 `my-project/`，包含：
+如果一切正常，你会看到 `✔ 验证通过`。
 
-- 完整的 Python 包结构（`src/my_project/`）
-- Harness 核心引擎：`runner.py`（任务执行）、`evaluator.py`（结果评估）、`state.py`（状态持久化）、`workflow.py`（工作流定义）
-- Agent stubs：`planner.py`、`generator.py`、`evaluator.py`
-- 运行时目录：`.harness/plans/`、`.harness/eval_feedback/`、`.harness/state/`、`.harness/templates/plan_template.md`、`.harness/progress.json`
-- 多命令 CLI：`run`、`evaluate`、`status`
-- `configs/`（dev/test/prod）、`docs/context.md`、`docs/decisions/`、`AGENTS.md`（含三角色工作流指令）、`opencode.yaml`
-- `pyproject.toml`、`Makefile`、`.gitignore`、`README.md`、`README.en.md`
-- 自动初始化的 Git 仓库和初始提交
+### 4. 邀请 AI 入场
 
-## 生成的项目结构
+用 Claude Code、Cursor 或 Codex 打开项目，对 AI 说：
+
+> "请阅读 `AGENTS.md`，以 Planner 角色帮我规划一个功能：添加一个 CLI 命令来显示系统信息。"
+
+AI 会自动读取工作流定义，按 **计划 → 生成 → 评估** 的节奏完成任务。
+
+---
+
+## 📁 生成的项目结构
 
 ```
-my-project/
-├── .harness/                 # Harness 运行时目录
-│   ├── plans/                # 执行计划
-│   ├── eval_feedback/        # 评估反馈
+my-awesome-project/
+├── .harness/                 # Agent 工作区
+│   ├── plans/                # 计划文件存放处
 │   ├── state/                # 状态持久化
-│   ├── templates/            # 模板文件
-│   │   └── plan_template.md  # Agent 标准计划模板
+│   ├── templates/            # 计划模板等
 │   ├── logs/                 # 运行日志
-│   └── progress.json         # 任务进度（含 current_stage、plans、last_updated）
-├── configs/                  # 多环境配置 (dev/test/prod)
-├── docs/                     # 文档
-│   ├── context.md            # Agent 上下文
-│   └── decisions/            # 架构决策记录
-├── src/my_project/           # 主包
-│   ├── __init__.py
+│   └── progress.json         # 任务进度追踪
+├── configs/                  # 多环境配置
+├── docs/                     # 文档（含 context.md 上下文）
+├── src/my_awesome_project/   # 主包
 │   ├── cli.py                # CLI 入口
-│   ├── harness/              # 核心引擎
-│   │   ├── runner.py
-│   │   ├── evaluator.py
-│   │   ├── state.py
-│   │   └── workflow.py
-│   ├── agents/               # Agent 骨架
-│   │   ├── planner.py
-│   │   ├── generator.py
-│   │   └── evaluator.py
+│   ├── harness/              # 核心引擎（runner/evaluator/state/workflow）
+│   ├── agents/               # Agent 骨架（planner/generator/evaluator）
 │   ├── tools/                # 工具函数
 │   └── utils/                # 通用辅助
-├── tests/                    # 测试
+├── tests/                    # 测试套件
 ├── .gitignore
-├── AGENTS.md                 # Agent 操作指南
-├── opencode.yaml             # 工作流配置
-├── Makefile
-├── pyproject.toml
+├── AGENTS.md                 # AI 工作流强制说明书
+├── opencode.yaml             # Codex 配置（含自定义命令）
+├── Makefile                  # 验证与自动化任务
+├── pyproject.toml            # 项目元数据与依赖
 ├── README.md                 # 中文说明
 └── README.en.md              # 英文说明
 ```
 
-## CLI 选项
+---
 
-```bash
-harness-init [OPTIONS] PROJECT_NAME
-```
+## 🛠️ 命令选项
 
 | 选项 | 简写 | 说明 |
-|------|------|------|
+| :--- | :--- | :--- |
 | `--force` | `-f` | 强制覆盖已存在的目录（旧目录自动备份） |
 | `--no-git` | | 跳过 Git 初始化 |
 | `--yes` | `-y` | 跳过所有交互提示，使用默认值 |
+| `--ci <platform>` | | 生成 CI 配置文件（目前支持 `github`） |
 | `--version` | `-v` | 显示版本号 |
-
-### 项目名规则
-
-为了生成合法的 Python 包，项目名必须：
-- 以字母或下划线开头
-- 只包含字母、数字、连字符（`-`）和下划线（`_`）
-- 不能为空，不能包含空格、路径分隔符或 `..`
-
-**合法示例**：`my-project`、`my_project`、`harness_v2`  
-**非法示例**：`123project`（数字开头）、`my project`（含空格）、`foo/../bar`（路径遍历）
-
-## 开发命令（针对 harness-init 本身）
-
-| 命令 | 说明 |
-|------|------|
-| `make verify` | 运行 ruff + pytest（覆盖率 ≥ 85%） |
-| `make test` | 运行 pytest |
-| `make lint` | 运行 ruff |
-| `make install` | `pip install -e .` |
-
-## 为什么生成的项目对 Agent 友好
-
-生成的项目专为外部智能体设计：
-
-- **`AGENTS.md`**：快速地图，含 Planner / Generator / Evaluator 三角色强制工作流，agent 第一眼就能理解自己该扮演什么角色
-- **`docs/context.md`**：深层上下文，包含架构细节、命名规范、常见任务示例
-- **`opencode.yaml`**：显式声明七阶段工作流配置
-- **`.harness/templates/plan_template.md`**：标准 Markdown 计划模板，Agent 创建计划时直接复制填写
-- **`.harness/progress.json`**：任务进度追踪（current_stage、plans、last_updated），支持多轮对话断点续传
-- **`make verify`**：统一验证入口，agent 修改后立即获得质量反馈
-
-## 架构
-
-- `src/harness_init/cli.py` — CLI 入口（参数解析）
-- `src/harness_init/core.py` — 项目生成核心逻辑（校验、复制、渲染、Git 初始化、回滚）
-- `src/harness_init/_utils.py` — 名称验证、模板渲染等辅助函数
-- `src/harness_init/_git.py` — Git 初始化与回滚辅助函数
-- `src/harness_init/templates/` — 目标项目的模板文件
-
-## 许可证
-
-MIT License
 
 ---
 
-[English Version](README.en.md)
+## 🗺️ 路线图
+
+### ✅ 已完成 (v0.3.0)
+- [x] 增强 `AGENTS.md`：强制三阶段工作流指令
+- [x] 标准化计划模板 `.harness/templates/plan_template.md`
+- [x] 状态文件 `progress.json` Schema 定义
+
+### 🔨 进行中 (v0.4.0)
+- [ ] 提供 Git Hook 脚本（`pre-commit`），支持手动启用
+- [ ] 可选生成 GitHub Actions CI 配置（`--ci github`）
+- [ ] 优化生成后的"下一步指引"提示
+
+### 📅 计划中
+- [ ] 适配更多 AI 工具：`CLAUDE.md`、`.cursorrules` 生成
+- [ ] 项目地图 `docs/PROJECT_MAP.md`（机器可读）
+- [ ] 探索多技术栈支持（Node.js / Go）
+
+> ⏰ 本项目由个人业余维护，路线图不承诺具体发布时间，按功能优先级和社区反馈动态调整。
+
+---
+
+## 📅 维护节奏
+
+- 🐛 **Bug 修复**：通常在一周内响应。
+- ✨ **新功能**：每 **2-4 周** 发布一个小版本，按路线图推进。
+- 💬 **Issue 回复**：尽量在 48 小时内回复。
+
+感谢你的耐心和理解！欢迎通过 Issues 和 Discussions 参与讨论。
+
+---
+
+## 🤝 贡献
+
+欢迎任何形式的贡献！请阅读 [CONTRIBUTING.md](./CONTRIBUTING.md) 了解开发规范和提交流程。
+
+---
+
+## 📄 许可证
+
+MIT License © [renjianguojinqianfan](https://github.com/renjianguojinqianfan)
+
+---
+
+## 🙏 致谢
+
+- [Typer](https://typer.tiangolo.com/) - 优雅的 CLI 框架
+- [Ruff](https://docs.astral.sh/ruff/) - 极速 Python Linter
+- [Pytest](https://docs.pytest.org/) - 可靠的测试框架
+- 灵感来源：Anthropic 的 GAN 式三智能体架构、OpenAI 的"代码仓库作为记录系统"实践、Martin Fowler 的 Harness Engineering 论述。
+
+---
+
+**[English Version](README.en.md)**

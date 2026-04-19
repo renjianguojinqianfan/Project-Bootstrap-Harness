@@ -57,6 +57,10 @@ The project follows a layered design. The CLI layer parses arguments and delegat
 types: feat, fix, docs, test, refactor, chore
 ```
 
+### 3.4 Plan File Format
+
+Plans are JSON files following the schema at `.harness/templates/plan_template.json`.
+
 ## 4. Development Workflow
 
 1. Read `AGENTS.md` for the quick project map.

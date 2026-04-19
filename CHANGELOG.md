@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0] - 2026-04-20
+
+### Added
+
+- **Plan Template v2 (Breaking)**: Converted `.harness/templates/plan_template.md` to `plan_template.json` with JSON Schema + YAML front matter for machine-readable plan validation.
+- **Approval Workflow**: `AGENTS.md` now enforces explicit `proposed → approved → completed` state machine. Human approval is mandatory before code generation.
+- **Security Guidelines**: Added Chinese-language security section to `AGENTS.md` covering: no auto-execution of unreviewed commands, secrets handling, and dependency scanning.
+- **DevOps Templates**:
+  - `.pre-commit-config.yaml`: Optional pre-commit hooks (ruff, trailing-whitespace, check-yaml).
+  - `.github/workflows/ci.yml`: GitHub Actions workflow with Python 3.11/3.12 matrix, `make verify`, and coverage reporting.
+  - `scripts/pre-push.sh` + `scripts/pre-push.ps1`: Cross-platform pre-push hooks.
+- **IDE Adapter Files**:
+  - `CLAUDE.md`: Quick-reference adapter for Claude Code aligned with AGENTS.md workflow.
+  - `.cursorrules`: Cursor IDE configuration enforcing project constraints (≤30 lines/function, ≥85% coverage).
+- **Documentation Templates**:
+  - `docs/PROJECT_MAP.md`: Machine-readable project structure map with YAML front matter.
+  - `docs/decisions/ADR_TEMPLATE.md`: Standard ADR template referencing Change Control Matrix.
+- **Cross-Platform Fix**: `.sh` scripts now get `0o755` executable permissions on Unix systems automatically.
+
+### Changed
+
+- **AGENTS.md**: Trimmed from 114 → 99 lines while adding approval workflow and security sections. All plan references now point to `.json` format.
+- **docs/context.md**: Synchronized to reference `plan_template.json` instead of `.md`.
+- **opencode.yaml**: Added note about optional `commands` section without adding the field itself (stays minimal).
+- `core.py`: `_create_directories()` now includes `scripts/` and `.github/workflows/`.
+
+### Fixed
+
+- `plan_template.md` removed; all references updated to `plan_template.json`.
+
 ## [0.3.0] - 2026-04-17
 
 ### Added

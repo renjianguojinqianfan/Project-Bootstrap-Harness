@@ -126,3 +126,115 @@ def test_generated_project_passes_make_verify(tmp_path: Path) -> None:
             check=False,
             capture_output=True,
         )
+
+
+def test_cli_quick_flag_creates_minimal_project(tmp_path: Path) -> None:
+    """--quick 应创建最小化项目，排除非必要文件。"""
+    app = typer.Typer()
+    app.command()(main)
+    project_path = tmp_path / "quick-cli"
+    result = runner.invoke(app, [str(project_path), "--quick", "--yes"])
+    assert result.exit_code == 0
+
+    # 排除的文件不应存在
+    excluded_files = [
+        project_path / "CLAUDE.md",
+        project_path / ".cursorrules",
+        project_path / ".github",
+        project_path / ".pre-commit-config.yaml",
+        project_path / "docs" / "decisions",
+        project_path / "scripts",
+    ]
+    for path in excluded_files:
+        assert not path.exists(), f"{path} should not exist in quick mode"
+
+    # 必要的文件必须存在
+    required_files = [
+        project_path / "AGENTS.md",
+        project_path / "src",
+        project_path / "tests",
+        project_path / "Makefile",
+        project_path / "pyproject.toml",
+        project_path / "README.md",
+    ]
+    for path in required_files:
+        assert path.exists(), f"{path} must exist in quick mode"
+
+    # AGENTS.md 应精简（≤50行）
+    agents_md = project_path / "AGENTS.md"
+    lines = agents_md.read_text(encoding="utf-8").splitlines()
+    assert len(lines) <= 50, f"AGENTS.md has {len(lines)} lines, expected ≤50"
+
+
+def test_cli_quick_and_yes_combine(tmp_path: Path) -> None:
+    """--quick --yes 应无提示并创建最小化项目。"""
+    app = typer.Typer()
+    app.command()(main)
+    project_path = tmp_path / "quick-yes-cli"
+    result = runner.invoke(app, [str(project_path), "--quick", "--yes"])
+    assert result.exit_code == 0
+
+    # 不应有交互提示输出（确认使用了默认值）
+    assert "Project description" not in result.output
+    assert "Author name" not in result.output
+    assert "Author email" not in result.output
+
+    # 项目结构应与 --quick 单独使用相同
+    excluded_files = [
+        project_path / "CLAUDE.md",
+        project_path / ".cursorrules",
+        project_path / ".github",
+    ]
+    for path in excluded_files:
+        assert not path.exists()
+
+    required_files = [
+        project_path / "AGENTS.md",
+        project_path / "src",
+        project_path / "tests",
+    ]
+    for path in required_files:
+        assert path.exists()
+
+
+def test_cli_quick_no_git(tmp_path: Path) -> None:
+    """--quick --no-git 应跳过 Git 初始化。"""
+    app = typer.Typer()
+    app.command()(main)
+    project_path = tmp_path / "quick-no-git-cli"
+    result = runner.invoke(app, [str(project_path), "--quick", "--no-git", "--yes"])
+    assert result.exit_code == 0
+
+    # .git 目录不应存在
+    assert not (project_path / ".git").exists()
+
+    # 其他文件仍应正确创建
+    assert (project_path / "AGENTS.md").exists()
+    assert (project_path / "src").exists()
+    assert (project_path / "pyproject.toml").exists()
+
+
+def test_cli_quick_force(tmp_path: Path) -> None:
+    """--quick --force 应覆盖已存在的目录。"""
+    app = typer.Typer()
+    app.command()(main)
+    project_path = tmp_path / "quick-force-cli"
+
+    # 先创建目录并添加旧文件
+    project_path.mkdir()
+    (project_path / "old.txt").write_text("old content")
+
+    # 无 --force 应失败
+    result = runner.invoke(app, [str(project_path), "--quick", "--yes"])
+    assert result.exit_code != 0
+
+    # 使用 --force 应成功
+    result = runner.invoke(app, [str(project_path), "--quick", "--force", "--yes"])
+    assert result.exit_code == 0
+
+    # 旧文件应被覆盖
+    assert not (project_path / "old.txt").exists()
+
+    # 新文件应存在
+    assert (project_path / "pyproject.toml").exists()
+    assert (project_path / "AGENTS.md").exists()

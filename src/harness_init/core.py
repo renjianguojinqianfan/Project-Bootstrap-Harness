@@ -14,13 +14,48 @@ from harness_init._utils import (
     _validate_project_name,
 )
 
+_QUICK_MODE_EXCLUSIONS: frozenset[str] = frozenset(
+    {
+        "CLAUDE.md",
+        ".cursorrules",
+        "opencode.yaml",
+        ".github/",
+        ".pre-commit-config.yaml",
+        "docs/decisions/",
+        "docs/PROJECT_MAP.md",
+        "docs/context.md",
+        "scripts/",
+        "configs/",
+        "README.en.md",
+        "src/{package_name}/agents/",
+        "src/{package_name}/harness/",
+        "src/{package_name}/tools/",
+        "src/{package_name}/utils/",
+        "tests/test_harness.py",
+    }
+)
+
 
 def _get_templates_dir() -> Path:
     """返回模板资源目录。"""
     return Path(__file__).parent / "templates"
 
 
-def _create_directories(project_path: Path, project_name: str) -> None:
+def _is_excluded_quick(rel_path: str, package_name: str) -> bool:
+    """判断相对路径是否在 quick 模式下被排除。"""
+    substituted = rel_path.replace("{package_name}", package_name)
+    for exclusion in _QUICK_MODE_EXCLUSIONS:
+        exc = exclusion.replace("{package_name}", package_name)
+        if exc.endswith("/"):
+            if substituted.startswith(exc) or substituted + "/" == exc:
+                return True
+        else:
+            if substituted == exc:
+                return True
+    return False
+
+
+def _create_directories(project_path: Path, project_name: str, quick: bool = False) -> None:
     """创建项目标准目录结构。"""
     package_name = _to_package_name(project_name)
     dirs = [
@@ -42,6 +77,8 @@ def _create_directories(project_path: Path, project_name: str) -> None:
         "tests",
     ]
     for d in dirs:
+        if quick and _is_excluded_quick(d + "/", package_name):
+            continue
         _ensure_dir(project_path / d)
 
 
@@ -71,15 +108,44 @@ def _copy_templates(
     description: str = "",
     author: str = "",
     email: str = "",
+    quick: bool = False,
 ) -> None:
     """复制模板文件到项目目录（递归）。"""
     templates_dir = _get_templates_dir()
     package_name = _to_package_name(project_name)
+
+    # 预扫描 .quick. 变体，确定哪些基础文件需要跳过
+    quick_bases: set[str] = set()
     for src in templates_dir.rglob("*"):
         if _should_skip(src):
             continue
+        if ".quick." in src.name:
+            base_rel = src.relative_to(templates_dir)
+            base_name = base_rel.name.replace(".quick.", ".")
+            base_path = base_rel.parent / base_name
+            quick_bases.add(str(base_path))
+
+    for src in templates_dir.rglob("*"):
+        if _should_skip(src):
+            continue
+
         rel = src.relative_to(templates_dir)
-        rel_str = str(rel).replace("{package_name}", package_name)
+
+        # 处理 .quick. 模板变体
+        if ".quick." in src.name:
+            if not quick:
+                continue
+            dest_name = rel.name.replace(".quick.", ".")
+            rel = rel.parent / dest_name
+        else:
+            if quick and str(rel) in quick_bases:
+                continue
+
+        rel_str = str(rel).replace("\\", "/").replace("{package_name}", package_name)
+
+        if quick and _is_excluded_quick(rel_str, package_name):
+            continue
+
         dst = project_path / rel_str
         dst.parent.mkdir(parents=True, exist_ok=True)
         _copy_or_render_template(src, dst, project_name, description, author, email)
@@ -88,12 +154,13 @@ def _copy_templates(
             dst.chmod(0o755)
 
 
-def _create_source_files(project_path: Path, project_name: str) -> None:
+def _create_source_files(project_path: Path, project_name: str, quick: bool = False) -> None:
     """创建初始 Python 源码和测试文件。"""
     package_name = _to_package_name(project_name)
     pkg_dir = project_path / "src" / package_name
-    for sub in ["harness", "agents", "tools", "utils"]:
-        (pkg_dir / sub / "__init__.py").write_text("", encoding="utf-8")
+    if not quick:
+        for sub in ["harness", "agents", "tools", "utils"]:
+            (pkg_dir / sub / "__init__.py").write_text("", encoding="utf-8")
     (project_path / "tests" / "__init__.py").write_text("", encoding="utf-8")
     (pkg_dir / "__init__.py").write_text(
         f'"""{package_name} package."""\n\n__version__ = "0.1.0"\n',
@@ -135,11 +202,12 @@ def _setup_project(
     description: str,
     author: str,
     email: str,
+    quick: bool = False,
 ) -> None:
     """创建目录、复制模板并生成初始源码。"""
-    _create_directories(path, project_name)
-    _copy_templates(path, project_name, description, author, email)
-    _create_source_files(path, project_name)
+    _create_directories(path, project_name, quick=quick)
+    _copy_templates(path, project_name, description, author, email, quick=quick)
+    _create_source_files(path, project_name, quick=quick)
     _create_progress_json(path, path.name)
 
 
@@ -151,6 +219,7 @@ def init_project(
     description: str = "",
     author: str = "",
     email: str = "",
+    quick: bool = False,
 ) -> None:
     """初始化新项目。
 
@@ -161,10 +230,11 @@ def init_project(
         description: 项目描述。
         author: 作者名。
         email: 作者邮箱。
+        quick: 是否使用快速模式生成最小项目。
     """
     path = Path(project_path)
     _prepare_project_path(path, force)
-    _setup_project(path, path.name, description, author, email)
+    _setup_project(path, path.name, description, author, email, quick=quick)
     if not no_git:
         try:
             _init_git(path, author, email)

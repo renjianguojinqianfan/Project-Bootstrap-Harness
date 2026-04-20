@@ -315,6 +315,79 @@ def test_init_project_skips_cache_files(tmp_path: Path) -> None:
         assert not any(f.name == bad for f in project_path.rglob("*"))
 
 
+def test_init_project_quick_creates_minimal_structure(tmp_path: Path) -> None:
+    """quick=True 应创建精简的项目结构。"""
+    project_path = tmp_path / "quick-proj"
+    init_project(str(project_path), quick=True)
+    assert (project_path / "src" / "quick_proj").is_dir()
+    assert (project_path / "tests").is_dir()
+    assert (project_path / ".harness").is_dir()
+    assert (project_path / "AGENTS.md").exists()
+    assert (project_path / "Makefile").exists()
+    assert (project_path / "pyproject.toml").exists()
+    assert (project_path / "README.md").exists()
+    assert (project_path / ".gitignore").exists()
+
+
+def test_init_project_quick_excludes_files(tmp_path: Path) -> None:
+    """quick=True 应排除完整模式的文件和目录。"""
+    project_path = tmp_path / "quick-proj"
+    init_project(str(project_path), quick=True)
+    assert not (project_path / "CLAUDE.md").exists()
+    assert not (project_path / ".cursorrules").exists()
+    assert not (project_path / ".github").exists()
+    assert not (project_path / ".pre-commit-config.yaml").exists()
+    assert not (project_path / "docs" / "decisions").exists()
+    assert not (project_path / "scripts").exists()
+    assert not (project_path / "configs").exists()
+    assert not (project_path / "opencode.yaml").exists()
+    assert not (project_path / "src" / "quick_proj" / "agents").exists()
+    assert not (project_path / "src" / "quick_proj" / "harness").exists()
+    assert not (project_path / "src" / "quick_proj" / "tools").exists()
+    assert not (project_path / "src" / "quick_proj" / "utils").exists()
+    assert not (project_path / "tests" / "test_harness.py").exists()
+
+
+def test_init_project_quick_agents_md_is_short(tmp_path: Path) -> None:
+    """quick=True 生成的 AGENTS.md 应不超过 50 行。"""
+    project_path = tmp_path / "quick-proj"
+    init_project(str(project_path), quick=True)
+    agents_md = project_path / "AGENTS.md"
+    assert agents_md.exists()
+    lines = agents_md.read_text(encoding="utf-8").splitlines()
+    assert len(lines) <= 50
+
+
+def test_init_project_quick_pyproject_has_minimal_deps(tmp_path: Path) -> None:
+    """quick=True 生成的 pyproject.toml 应只包含最小依赖。"""
+    project_path = tmp_path / "quick-proj"
+    init_project(str(project_path), quick=True)
+    pyproject = project_path / "pyproject.toml"
+    assert pyproject.exists()
+    content = pyproject.read_text(encoding="utf-8")
+    assert "pydantic" not in content
+    assert "pyyaml" not in content
+    assert "rich" not in content
+    assert "typer" in content
+
+
+def test_init_project_quick_uses_quick_templates(tmp_path: Path) -> None:
+    """quick=True 应使用 quick 模板生成源码和测试文件。"""
+    project_path = tmp_path / "quick-proj"
+    init_project(str(project_path), quick=True)
+    cli_path = project_path / "src" / "quick_proj" / "cli.py"
+    test_cli_path = project_path / "tests" / "test_cli.py"
+    assert cli_path.exists()
+    assert test_cli_path.exists()
+    cli_content = cli_path.read_text(encoding="utf-8")
+    # quick 模板不应包含 harness 相关导入
+    assert "harness" not in cli_content
+    test_content = test_cli_path.read_text(encoding="utf-8")
+    # quick 测试模板应测试 hello 命令和 version
+    assert "hello" in test_content
+    assert "0.1.0" in test_content
+
+
 def test_init_project_injects_metadata(tmp_path: Path) -> None:
     """应正确将描述、作者和邮箱注入到生成项目的文件和 Git 配置中。"""
     project_path = tmp_path / "meta-project"

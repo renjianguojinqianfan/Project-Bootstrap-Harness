@@ -35,6 +35,22 @@ When coding with Claude Code, Codex, or Cursor, have you ever run into these sit
 
 ---
 
+## 📊 Proven Results
+
+We ran a controlled experiment using Trae Solo Coder, tasking it with adding a new CLI subcommand.
+
+| Metric | Plain Project | PBH Project |
+| :--- | :--- | :--- |
+| Human clarifications needed | 2 | **1** |
+| AI task steps | 10 | **6** |
+| Debugging cycles | 4 | **1** |
+| Quality gate executed | No | **Yes (`make verify`)** |
+| Total time | 15-20 min | **5-8 min** |
+
+👉 **[Read the full report →](docs/experiments/trae-solo-comparison.md)**
+
+---
+
 ## 📦 Installation
 
 ```bash

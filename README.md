@@ -35,6 +35,22 @@
 
 ---
 
+## 📊 效果验证
+
+我们用 Trae Solo Coder 做了一次严格的对照实验，任务是为 CLI 项目添加一个新子命令。
+
+| 指标 | 普通项目 | PBH 项目 |
+| :--- | :--- | :--- |
+| 人类需要澄清的次数 | 2 次 | **1 次** |
+| AI 执行的任务步骤数 | 10 步 | **6 步** |
+| 调试修复次数 | 4 次 | **1 次** |
+| 是否主动运行质量门禁 | 否 | **是 (`make verify`)** |
+| 总耗时 | 15-20 分钟 | **5-8 分钟** |
+
+👉 **[查看完整实验报告 →](docs/experiments/trae-solo-comparison.md)**
+
+---
+
 ## 📦 安装
 
 ```bash
@@ -55,14 +71,37 @@ harness-init my-awesome-project
 
 按提示输入项目描述、作者信息（或使用 `--yes` 跳过）。
 
-### 2. 进入项目并安装依赖
+### 2. 快速体验模式
+
+如果你只想快速体验核心功能，可以使用 `--quick` 模式：
+
+```bash
+harness-init my-project --quick --yes
+```
+
+**精简模式包含：**
+- 核心项目结构（`src/`、`tests/`）
+- `AGENTS.md`（简化版，保留三角色工作流）
+- `Makefile`、`pyproject.toml`、`README.md`
+- `.harness/` 工作区（计划模板 + 状态追踪）
+
+**精简模式不包含：**
+- CI/CD 配置（`.github/workflows/`）
+- IDE 适配文件（`CLAUDE.md`、`.cursorrules`）
+- 文档体系（`docs/decisions/`、`PROJECT_MAP`）
+- Git Hooks（`.pre-commit-config.yaml`）
+- Agent 子系统（`harness/`、`agents/`、`tools/`、`utils/`）
+
+适合场景：快速原型验证、5分钟上手体验、个人工具项目。
+
+### 3. 进入项目并安装依赖
 
 ```bash
 cd my-awesome-project
 pip install -e ".[dev]"
 ```
 
-### 3. 运行验证流水线
+### 4. 运行验证流水线
 
 ```bash
 make verify
@@ -70,7 +109,9 @@ make verify
 
 如果一切正常，你会看到 `✔ 验证通过`。
 
-### 4. 邀请 AI 入场
+> 💡 使用 `--quick` 模式生成的精简项目结构更简单，详见上方"快速体验模式"。
+
+### 5. 邀请 AI 入场
 
 用 Claude Code、Cursor 或 Codex 打开项目，对 AI 说：
 
@@ -117,6 +158,7 @@ my-awesome-project/
 | `--force` | `-f` | 强制覆盖已存在的目录（旧目录自动备份） |
 | `--no-git` | | 跳过 Git 初始化 |
 | `--yes` | `-y` | 跳过所有交互提示，使用默认值 |
+| `--quick` | `-q` | 生成精简项目（无 CI/文档/钩子/IDE 配置） |
 | `--ci <platform>` | | 生成 CI 配置文件（目前支持 `github`） |
 | `--version` | `-v` | 显示版本号 |
 

@@ -107,6 +107,24 @@ pip install -e ".[dev]"
 make verify
 ```
 
+> 💡 **如果 `make` 命令不可用**
+>
+> Windows 用户可能未安装 `make`，macOS / Linux 通常已内置。若提示 `'make' 不是内部或外部命令`，你可以：
+>
+> 1. **安装 make**（推荐）：
+>    - **Windows**：安装 [GnuWin32 Make](https://gnuwin32.sourceforge.net/packages/make.htm) 或使用 `winget install GnuWin32.Make`；也可通过 Chocolatey 安装：`choco install make`。
+>    - **macOS**：通常已内置，若缺失则安装 Xcode Command Line Tools：`xcode-select --install`。
+>    - **Linux**：使用包管理器安装，如 `sudo apt install make` (Debian/Ubuntu) 或 `sudo yum install make` (CentOS/RHEL)。
+>
+> 2. **直接运行等价命令**（无需 make）：
+>    ```bash
+>    ruff check src/ tests/
+>    ruff format --check src/ tests/
+>    mypy src/
+>    pytest tests/ -v --cov=src --cov-fail-under=85
+>    ```
+>    这些命令与 `make verify` 完全等效。
+
 如果一切正常，你会看到 `✔ 验证通过`。
 
 > 💡 使用 `--quick` 模式生成的精简项目结构更简单，详见上方"快速体验模式"。

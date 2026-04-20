@@ -84,6 +84,24 @@ pip install -e ".[dev]"
 make verify
 ```
 
+> 💡 **If `make` is not available**
+>
+> Windows users may not have `make` installed. If you see `'make' is not recognized`, you can:
+>
+> 1. **Install make** (recommended):
+>    - **Windows**: Install [GnuWin32 Make](https://gnuwin32.sourceforge.net/packages/make.htm) or use `winget install GnuWin32.Make`; also via Chocolatey: `choco install make`.
+>    - **macOS**: Usually built-in. If missing, install Xcode Command Line Tools: `xcode-select --install`.
+>    - **Linux**: Use your package manager, e.g., `sudo apt install make` (Debian/Ubuntu).
+>
+> 2. **Run equivalent commands directly** (no make required):
+>    ```bash
+>    ruff check src/ tests/
+>    ruff format --check src/ tests/
+>    mypy src/
+>    pytest tests/ -v --cov=src --cov-fail-under=85
+>    ```
+>    These commands are exactly what `make verify` executes.
+
 If everything is fine, you'll see `✔ Verification passed`.
 
 ### 4. Invite AI In

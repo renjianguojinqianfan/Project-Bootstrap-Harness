@@ -17,16 +17,6 @@ skills:
   - openspec
   - spec-kit
 
-workflow:
-  stages:
-    - feedback
-    - triage
-    - clarify
-    - plan
-    - execute
-    - evaluate
-    - done
-
 # NOTE: You may add a `commands` section here to define custom CLI shortcuts.
 #       This template omits it to stay minimal; add only if your team needs them.
 

@@ -34,9 +34,6 @@ htmlcov/
 .coverage.*
 
 # Harness Engineering
-.harness/plans/
-.harness/eval_feedback/
-.harness/state/
 .harness/logs/
 *.backup.json
 .agent/

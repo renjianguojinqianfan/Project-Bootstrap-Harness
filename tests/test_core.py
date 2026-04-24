@@ -2,8 +2,6 @@
 
 from pathlib import Path
 
-import pytest
-
 from harness_init.core import init_project
 
 
@@ -232,14 +230,13 @@ def test_init_project_generated_cli_uses_typer_typer(tmp_path: Path) -> None:
     assert "typer.run(hello)" not in content
 
 
-def test_init_project_gitignore_has_plans_and_eval_feedback(tmp_path: Path) -> None:
-    """.gitignore 应排除 .harness/plans/ 和 .harness/eval_feedback/。"""
+def test_init_project_gitignore_has_harness_entries(tmp_path: Path) -> None:
+    """.gitignore 应排除 .harness 相关目录。"""
     project_path = tmp_path / "test-project"
     init_project(str(project_path))
     gitignore = project_path / ".gitignore"
     content = gitignore.read_text(encoding="utf-8")
-    assert ".harness/plans/" in content
-    assert ".harness/eval_feedback/" in content
+    assert ".harness/logs/" in content
 
 
 def test_init_project_skips_cache_files(tmp_path: Path) -> None:
@@ -340,6 +337,24 @@ def test_init_project_injects_metadata(tmp_path: Path) -> None:
     git_config = (project_path / ".git" / "config").read_text(encoding="utf-8")
     assert "bob@test.com" in git_config
     assert "Bob" in git_config
+    project_map = project_path / "docs" / "PROJECT_MAP.md"
+    assert project_map.exists()
+    pm_content = project_map.read_text(encoding="utf-8")
+    assert "cli" in pm_content  # project_type default
+    assert "{{generated_date}}" not in pm_content
+    assert "{generated_date}" not in pm_content  # should be replaced
+
+
+def test_init_project_replaces_project_type(tmp_path: Path) -> None:
+    """AGENTS.md 和 CLAUDE.md 应正确替换 {project_type}。"""
+    project_path = tmp_path / "type-project"
+    init_project(str(project_path))
+    agents_md = (project_path / "AGENTS.md").read_text(encoding="utf-8")
+    claude_md = (project_path / "CLAUDE.md").read_text(encoding="utf-8")
+    assert "{project_type}" not in agents_md
+    assert "{project_type}" not in claude_md
+    assert "cli" in agents_md
+    assert "cli" in claude_md
 
 
 def test_generated_project_document_consistency(tmp_path: Path) -> None:

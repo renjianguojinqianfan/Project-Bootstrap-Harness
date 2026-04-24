@@ -7,7 +7,7 @@ test:
 	pytest tests/ -v --cov=src --cov-fail-under=85
 
 lint:
-	ruff check src/
+	ruff check src/ tests/
 
 install:
 	pip install -e ".[dev]"

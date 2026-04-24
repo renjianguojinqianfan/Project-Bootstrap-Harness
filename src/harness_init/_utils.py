@@ -1,6 +1,7 @@
 """Utility helpers for harness-init."""
 
 import re
+from datetime import UTC, datetime
 from pathlib import Path
 
 
@@ -65,6 +66,8 @@ def _copy_or_render_template(
         "{project_description}": description,
         "{author_name}": author or "harness-init",
         "{author_email}": email or "harness-init@example.com",
+        "{project_type}": "cli",
+        "{generated_date}": datetime.now(UTC).strftime("%Y-%m-%d"),
     }
     content = template_path.read_text(encoding="utf-8")
     for placeholder, value in replacements.items():

@@ -1,11 +1,3 @@
-runner:
-  stop_on_error: false
-
-evaluator:
-  min_score: 70
-
-state:
-  path: ".harness/state/state.json"
-
+# Development environment configuration
 logging:
   level: DEBUG

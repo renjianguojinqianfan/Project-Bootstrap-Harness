@@ -1,10 +1,10 @@
 """Tests for core.py Git initialization logic."""
 
+import subprocess as sp
 from pathlib import Path
 from unittest.mock import patch
 
 import pytest
-import subprocess as sp
 
 from harness_init.core import init_project
 

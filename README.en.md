@@ -1,8 +1,8 @@
 # Project-Bootstrap-Harness (PBH)
 
-> A **Python project protocol template** designed for AI-assisted development.
-> 
-> It doesn't tell AI how to write code. Instead, from the very first second a project is born, it writes down "how we collaborate here" as a machine-readable contract.
+> A **project protocol template** designed for AI-assisted development.
+>
+> We don't tell AI how to think. We give it the best environment to work in.
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![PyPI](https://img.shields.io/badge/pypi-harness--init-green.svg)](https://pypi.org/project/harness-init/)
@@ -12,48 +12,32 @@
 
 ## Why This Exists
 
-When coding with Claude Code, Cursor, or Codex, you've likely hit these friction points:
+When coding with Claude Code, Cursor, or OpenCode, you've likely hit these friction points:
 
 - **Repeating rules in every new session**: "Remember to run tests", "Don't touch unrelated files", "Plan before coding"
 - **AI writes code but never verifies it**: Small errors snowball, and humans end up cleaning the mess
-- **Inconsistent AI direction across the team**: Colleague A tells AI to edit directly, Colleague B asks for a proposal first—code style becomes chaos
+- **Context lost when switching tools**: What Claude Code understood, Cursor doesn't know
 
-**The problem isn't that AI isn't smart enough. It's that the project itself lacks a "default collaboration protocol."**
+**The problem isn't that AI isn't smart enough. It's that the project itself lacks a default collaboration protocol.**
 
-PBH plants that protocol, quality gates, and state tracking into your project the moment you run `harness-init my-project`. From then on, any AI tool opening this project knows within one minute: what the workflow is, where the quality baseline sits, and what the last person (or AI) was doing.
+PBH plants that protocol, quality gates, and state tracking into your project the moment you run `harness-init my-project`. From then on, any AI tool opening this project knows within 30 seconds: how to run tests, where the quality baseline sits, and what phase the project is in.
 
 ---
 
-## What It Does (and Doesn't Do)
+## What It Is (and Isn't)
 
-### ✅ It's a "Collaboration Contract"
+### ✅ PBH Is
 
-- **`AGENTS.md`**: A 50-100 line project-level system prompt defining the Planner → Generator → Evaluator workflow, change control matrix, and security guidelines
-- **`docs/context.md`**: Deep context (architecture overview, naming conventions, common tasks)
-- **`.harness/progress.json`**: Cross-session state tracking, helping AI resume context quickly in new sessions  
-  (Example: `{"current_stage": "plan", "plans": [{"id": "plan_001", "status": "approved"}], "last_updated": "2026-04-20T12:00:00Z"}`)
+- **A universal collaboration protocol**: `AGENTS.md` serves as the common entry point for all AI tools, defining critical rules, working guidelines, and project structure
+- **Quality gate infrastructure**: `make verify` works out of the box — lint, tests, and coverage in one command
+- **An observable Agent behavior benchmark**: The same `AGENTS.md` lets you observe how different AI tools follow rules and perform
+- **A Spec Coding container**: Provides the `tasks/` directory for you to break down work; content is entirely up to you
 
-### ✅ It's Quality Gate Infrastructure
+### ❌ PBH Is NOT
 
-- **`make verify`**: One-command runs ruff + pytest with ≥85% coverage threshold
-- **GitHub Actions CI**: Checks run on every push
-- **Git Hooks**: Catches style issues before commits
-
-### ✅ It Includes Extensible Skeleton Code
-
-Generated projects contain minimal runnable Harness components:
-- `harness/runner.py`: Asynchronously executes command steps defined in JSON plan files (serial orchestration + single-task error halting)
-- `harness/evaluator.py`: Three-dimensional scoring based on execution results (status/completion rate/errors)
-- `harness/state.py`: Atomic JSON state reads/writes (`tempfile` + `os.replace` ensures write safety)
-- `harness/workflow.py`: Seven-stage state machine (Feedback → Triage → Clarify → Plan → Execute → Evaluate → Done)
-
-### ❌ It's NOT an Agent Runtime
-
-PBH **does not enforce** agent behavior. It won't stop an AI from skipping Planner and writing code directly, nor will it automatically advance workflow states. It provides **protocols and tools**—whether an agent follows them depends on the agent tool's comprehension and human supervision.
-
-### ❌ It's NOT a Code Generator
-
-PBH does not generate business logic from natural language descriptions. It generates **project structure, configuration files, and interface skeletons**. The business logic is up to you (or your AI) to fill in.
+- **Not an Agent framework**: Does not define AI roles or implement multi-agent orchestration
+- **Not a code generator**: Does not generate business logic from natural language
+- **Not a Spec Coding workflow tool**: Does not generate PRDs, SPECs, or constraints.md — only provides directories for them
 
 ---
 
@@ -62,7 +46,7 @@ PBH does not generate business logic from natural language descriptions. It gene
 ```bash
 pip install harness-init
 
-# Full mode (includes CI, IDE adapters, docs, Harness skeleton)
+# Full mode
 harness-init my-awesome-project
 
 # Quick mode (minimal, 5-minute onboarding)
@@ -74,7 +58,7 @@ Enter the project and verify:
 ```bash
 cd my-awesome-project
 pip install -e ".[dev]"
-make verify        # Should output ✔ Verification passed
+make verify        # Should output ✅ Verification passed
 ```
 
 ### 💡 If make is not available
@@ -83,99 +67,102 @@ Windows users may not have make installed. If you see 'make' is not recognized, 
 
 **Install make:**
 
-- Windows: Install GnuWin32 Make or `winget install GnuWin32.Make`
+- Windows: Install [GnuWin32 Make](https://gnuwin32.sourceforge.net/packages/make.htm) or run `winget install GnuWin32.Make`
 - macOS: `xcode-select --install`
-- Linux: `sudo apt install make`
+- Linux: `sudo apt install make` or equivalent
 
-**Run equivalent commands directly:**
+**Or run equivalent commands directly:**
 
 ```bash
+# Code style check
 ruff check src/ tests/
-ruff format --check src/ tests/
-mypy src/
+
+# Run tests + coverage
 pytest tests/ -v --cov=src --cov-fail-under=85
 ```
 
 Invite AI to the party:
 
-> "Please read AGENTS.md and help me plan a feature following the workflow defined there."
+> "Please read AGENTS.md to understand the project rules, then help me get started."
+
+---
 
 ## Generated Project Structure
 
 ```text
 my-awesome-project/
-├── .harness/                 # Workspace
-│   ├── plans/                # Plan files (JSON Schema)
-│   ├── state/                # Persistent state
-│   ├── templates/            # Plan templates
-│   ├── logs/                 # Execution logs
-│   └── progress.json         # Session state (AI's first stop in new sessions)
-├── configs/                  # Multi-environment configs
+├── .harness/
+│   ├── progress.json         # Project phase state (AI's first stop in new sessions)
+│   └── workspaces/           # Multi-agent workspace isolation (reserved)
 ├── docs/
 │   ├── context.md            # Deep context (architecture, conventions, tasks)
 │   └── decisions/            # Architecture Decision Records (ADR)
 ├── src/my_awesome_project/
-│   ├── cli.py                # Optional CLI entry (Typer); delete or repurpose if not needed
-│   ├── harness/              # Minimal runnable skeleton (runner/evaluator/state/workflow)
-│   ├── agents/               # Agent interface placeholders (implement LLM calls yourself)
-│   ├── tools/                # Utility functions
-│   └── utils/                # Common helpers
-├── tests/                    # Test suite
-├── AGENTS.md                 # AI collaboration protocol (project-level system prompt)
-├── Makefile                  # verify / fix / test
+│   └── cli.py                # CLI entry point (replaceable as needed)
+├── tests/                    # Test suite (mirrors src/ structure)
+├── tasks/                    # Task breakdown (Spec Coding container)
+├── AGENTS.md                 # AI collaboration protocol (common entry for all tools)
+├── Makefile                  # verify / test / lint / fix
 ├── pyproject.toml            # Dependencies + tool configs
 └── README.md
 ```
 
-About harness/ and agents/ directories: These are interface skeletons and runnable examples, not production-grade agent runtimes. runner.py can execute JSON plan files, and evaluator.py scores against fixed dimensions, but orchestration is currently serial-only with no timeout controls or retry mechanisms. You can extend them or replace them entirely.
+---
+
+## AGENTS.md: The Common Entry Point for All AI Tools
+
+The core file PBH generates is `AGENTS.md`, structured as an "airport navigation" guide that helps AI understand the project in 30 seconds:
+
+- **Quick Start**: First steps, how to run verification
+- **Multi-Agent Notice**: Supports multiple AIs working concurrently; recommends independent git worktrees
+- **Working Guidelines**: Flexible guidance — state your plan before coding, focus on atomic tasks, verify after completion
+- **Critical Rules**: Non-negotiable quality baseline
+- **Security Guidelines**: No hardcoded secrets, command review, etc.
+- **File Mapping**: At-a-glance directory reference
+
+PBH does not define AI roles or enforce specific workflows. It provides a universal protocol that all AI tools can understand.
+
+---
 
 ## Mode Comparison
 
 | Feature | Full Mode | Quick Mode (--quick) |
 |---------|-----------|---------------------|
-| AGENTS.md | Full (90 lines, incl. approval workflow) | Minimal (30 lines, core workflow only) |
-| Harness skeleton | ✅ runner + evaluator + state + workflow | ❌ |
-| Agent placeholders | ✅ planner + generator + evaluator | ❌ |
+| AGENTS.md | Full (≤80 lines) | Minimal (≤50 lines) |
 | CI/CD | ✅ GitHub Actions | ❌ |
-| IDE adapters | ✅ CLAUDE.md / .cursorrules / opencode.yaml | ❌ |
-| Documentation | ✅ context.md / PROJECT_MAP / ADR | ❌ |
-| Dependencies | typer + pydantic + pyyaml + rich | typer only |
+| Documentation | ✅ context.md / ADR | ❌ |
+| Dependencies | typer + pytest + ruff, etc. | typer only |
 
-## Core Value: Reducing Three Types of Friction
+Both modes include: `AGENTS.md`, `Makefile` (verify/test/lint), `tests/` directory, `tasks/` directory, `progress.json`.
 
-### Context Alignment Cost
-
-When AI enters a new project, it no longer has to figure out "how things work here" from scratch. AGENTS.md + context.md provide a structured onboarding manual.
-
-### Spec Drift Cost
-
-When developers switch machines or AI tools start fresh sessions, .harness/progress.json records the current stage and pending tasks, reducing repetitive explanations.
-
-### Quality Regression Cost
-
-`make verify` hardens code style, unit tests, and coverage checks into a non-optional command. Whether an agent runs it proactively depends on its discipline, but the command itself is always available and consistent.
+---
 
 ## Use Cases
 
 **Good for:**
 
-- Individual developers using AI tools (Claude Code / Cursor / Codex) to quickly bootstrap Python projects (CLI tools, script libraries, automation scripts, prototypes, etc.)
-- Small teams unifying AI collaboration standards ("All our projects follow this structure")
-- AI-assisted development workflows that require verifiability and handoff clarity
+- Individual developers using multiple AI tools who want unified project-level collaboration rules
+- Small teams standardizing AI collaboration practices
+- AI-assisted development workflows that need verifiability and handoff clarity
+- Observing and comparing how different AI tools behave in the same project
 
 **Not ideal for:**
 
-- Deterministic automation pipelines requiring guaranteed execution (PBH doesn't lock down agent behavior)
-- Complex multi-agent autonomous systems (current runner only supports serial command execution)
-- Non-Python projects (current templates only support Python 3.11+)
+- Multi-agent autonomous orchestration → Use a dedicated Agent framework
+- Deterministic unattended pipelines → PBH does not lock down Agent behavior
+- Non-Python projects → Current templates only support Python 3.11+
+
+---
 
 ## Roadmap
 
-- **v1.0.0**: Python project template, JSON plan format, quality gates, Quick mode, PyPI release
-- **v1.1.0**: Multi-stack templates (Node.js / Go), template plugin system
-- **v1.2.0**: Enhanced runner orchestration (timeout controls, retry mechanisms)
+- **v1.1.0**: Remove out-of-scope features, rewrite AGENTS.md as "airport navigation", establish clear boundaries
+- **v1.5.0**: `--ide` parameter (on-demand IDE adapter files), `--template` parameter (lib/web/notebook project types)
+- **v2.0.0**: Multi-agent native support, ecosystem interfaces, official universal protocol announcement
 
-This project is maintained by an individual in spare time. The roadmap adjusts dynamically based on priorities and community feedback.
+This project is maintained by an individual in spare time. The roadmap adjusts dynamically based on priorities.
+
+---
 
 ## Acknowledgments
 

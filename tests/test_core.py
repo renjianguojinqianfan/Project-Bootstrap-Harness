@@ -1,6 +1,5 @@
 """Tests for core.py basic initialization and content."""
 
-import sys
 from pathlib import Path
 
 import pytest
@@ -20,20 +19,9 @@ def test_init_project_creates_subdirectories(tmp_path: Path) -> None:
     project_path = tmp_path / "test-project"
     init_project(str(project_path))
     assert (project_path / ".github" / "workflows").is_dir()
-    assert (project_path / ".harness" / "plans").is_dir()
-    assert (project_path / ".harness" / "eval_feedback").is_dir()
-    assert (project_path / ".harness" / "state").is_dir()
     assert (project_path / ".harness" / "templates").is_dir()
-    assert (project_path / ".harness" / "logs").is_dir()
-    assert (project_path / "configs").is_dir()
     assert (project_path / "docs").is_dir()
-    assert (project_path / "docs" / "decisions").is_dir()
-    assert (project_path / "scripts").is_dir()
     assert (project_path / "src" / "test_project").is_dir()
-    assert (project_path / "src" / "test_project" / "harness").is_dir()
-    assert (project_path / "src" / "test_project" / "agents").is_dir()
-    assert (project_path / "src" / "test_project" / "tools").is_dir()
-    assert (project_path / "src" / "test_project" / "utils").is_dir()
     assert (project_path / "tests").is_dir()
 
 
@@ -75,9 +63,6 @@ def test_init_project_creates_cursorrules(tmp_path: Path) -> None:
     assert cursorrules.exists()
     content = cursorrules.read_text(encoding="utf-8")
     assert "test-project" in content
-    assert "Code Style" in content
-    assert "Testing" in content
-    assert "Agent Workflow" in content
 
 
 def test_init_project_creates_pre_commit_config(tmp_path: Path) -> None:
@@ -171,15 +156,14 @@ def test_init_project_creates_progress_json(tmp_path: Path) -> None:
     assert "last_updated" in data
 
 
-def test_init_project_agents_md_has_workflow(tmp_path: Path) -> None:
-    """AGENTS.md 应包含三角色工作流指令。"""
+def test_init_project_agents_md_has_rules(tmp_path: Path) -> None:
+    """AGENTS.md 应包含致命规则。"""
     project_path = tmp_path / "test-project"
     init_project(str(project_path))
     agents_md = project_path / "AGENTS.md"
     content = agents_md.read_text(encoding="utf-8")
-    assert "Planner" in content
-    assert "Generator" in content
-    assert "Evaluator" in content
+    assert "make verify" in content
+    assert "Critical Rules" in content
 
 
 def test_init_project_creates_plan_template_json(tmp_path: Path) -> None:
@@ -203,20 +187,8 @@ def test_init_project_creates_source_files(tmp_path: Path) -> None:
     init_project(str(project_path))
     assert (project_path / "src" / "test_project" / "__init__.py").exists()
     assert (project_path / "src" / "test_project" / "cli.py").exists()
-    assert (project_path / "src" / "test_project" / "harness" / "__init__.py").exists()
-    assert (project_path / "src" / "test_project" / "agents" / "__init__.py").exists()
-    assert (project_path / "src" / "test_project" / "tools" / "__init__.py").exists()
-    assert (project_path / "src" / "test_project" / "utils" / "__init__.py").exists()
     assert (project_path / "tests" / "__init__.py").exists()
     assert (project_path / "tests" / "test_cli.py").exists()
-    assert (project_path / "tests" / "test_harness.py").exists()
-
-
-def test_init_project_creates_harness_runner(tmp_path: Path) -> None:
-    """应生成 harness/runner.py。"""
-    project_path = tmp_path / "test-project"
-    init_project(str(project_path))
-    assert (project_path / "src" / "test_project" / "harness" / "runner.py").exists()
 
 
 def test_init_project_creates_docs_context(tmp_path: Path) -> None:
@@ -233,19 +205,6 @@ def test_init_project_creates_configs(tmp_path: Path) -> None:
     assert (project_path / "configs" / "dev.yaml").exists()
     assert (project_path / "configs" / "test.yaml").exists()
     assert (project_path / "configs" / "prod.yaml").exists()
-
-
-def test_init_project_creates_all_harness_and_agent_files(tmp_path: Path) -> None:
-    """应生成所有 harness 和 agents 文件。"""
-    project_path = tmp_path / "test-project"
-    init_project(str(project_path))
-    pkg = project_path / "src" / "test_project"
-    assert (pkg / "harness" / "evaluator.py").exists()
-    assert (pkg / "harness" / "state.py").exists()
-    assert (pkg / "harness" / "workflow.py").exists()
-    assert (pkg / "agents" / "planner.py").exists()
-    assert (pkg / "agents" / "generator.py").exists()
-    assert (pkg / "agents" / "evaluator.py").exists()
 
 
 def test_init_project_entry_point_importable(tmp_path: Path) -> None:
@@ -271,30 +230,6 @@ def test_init_project_generated_cli_uses_typer_typer(tmp_path: Path) -> None:
     content = (project_path / "src" / "test_project" / "cli.py").read_text(encoding="utf-8")
     assert "app = typer.Typer()" in content
     assert "typer.run(hello)" not in content
-
-
-def test_init_project_runner_uses_posix_shlex(tmp_path: Path) -> None:
-    """生成的 runner.py 应使用 posix-aware shlex.split。"""
-    project_path = tmp_path / "test-project"
-    init_project(str(project_path))
-    runner_path = project_path / "src" / "test_project" / "harness" / "runner.py"
-    content = runner_path.read_text(encoding="utf-8")
-    assert 'shlex.split(command, posix=os.name != "nt")' in content
-
-
-def test_init_project_state_manager_handles_corrupt_json(tmp_path: Path) -> None:
-    """StateManager 应能处理损坏的 JSON 状态文件。"""
-    project_path = tmp_path / "test-project"
-    init_project(str(project_path))
-    state_file = project_path / ".harness" / "state" / "state.json"
-    state_file.write_text("not json", encoding="utf-8")
-
-    pkg_src = str(project_path / "src")
-    if pkg_src not in sys.path:
-        sys.path.insert(0, pkg_src)
-    mod = __import__("test_project.harness.state", fromlist=["StateManager"])
-    sm = mod.StateManager(str(state_file))
-    assert sm._data == {}
 
 
 def test_init_project_gitignore_has_plans_and_eval_feedback(tmp_path: Path) -> None:
@@ -341,10 +276,6 @@ def test_init_project_quick_excludes_files(tmp_path: Path) -> None:
     assert not (project_path / "scripts").exists()
     assert not (project_path / "configs").exists()
     assert not (project_path / "opencode.yaml").exists()
-    assert not (project_path / "src" / "quick_proj" / "agents").exists()
-    assert not (project_path / "src" / "quick_proj" / "harness").exists()
-    assert not (project_path / "src" / "quick_proj" / "tools").exists()
-    assert not (project_path / "src" / "quick_proj" / "utils").exists()
     assert not (project_path / "tests" / "test_harness.py").exists()
 
 
@@ -418,15 +349,10 @@ def test_generated_project_document_consistency(tmp_path: Path) -> None:
     project_path = tmp_path / "consistency-project"
     init_project(str(project_path))
     agents_md = (project_path / "AGENTS.md").read_text(encoding="utf-8")
-    context_md = (project_path / "docs" / "context.md").read_text(encoding="utf-8")
     plan_template = project_path / ".harness" / "templates" / "plan_template.json"
-    assert "plan_template.json" in agents_md
-    assert "plan_template.md" not in agents_md
-    assert "plan_template.json" in context_md
-    assert "Planner" in agents_md
-    assert "Generator" in agents_md
-    assert "Evaluator" in agents_md
-    assert len(agents_md.splitlines()) <= 100
+    assert "make verify" in agents_md
+    assert "Critical Rules" in agents_md
+    assert len(agents_md.splitlines()) <= 110
     plan_data = json.loads(plan_template.read_text(encoding="utf-8"))
     assert "goal" in plan_data["$schema"]["properties"]
     assert "steps" in plan_data["$schema"]["properties"]

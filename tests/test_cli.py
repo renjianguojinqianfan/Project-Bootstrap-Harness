@@ -21,8 +21,8 @@ def test_main_creates_project(tmp_path: Path) -> None:
     assert result.exit_code == 0
     assert project_path.is_dir()
     assert (project_path / ".git").is_dir()
-    assert (project_path / ".harness" / "plans").is_dir()
-    assert (project_path / "src" / "my_project" / "harness" / "runner.py").exists()
+    assert (project_path / ".harness" / "templates").is_dir()
+    assert (project_path / "src" / "my_project" / "cli.py").exists()
     assert (project_path / "docs" / "context.md").exists()
 
 

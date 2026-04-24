@@ -27,10 +27,6 @@ _QUICK_MODE_EXCLUSIONS: frozenset[str] = frozenset(
         "scripts/",
         "configs/",
         "README.en.md",
-        "src/{package_name}/agents/",
-        "src/{package_name}/harness/",
-        "src/{package_name}/tools/",
-        "src/{package_name}/utils/",
         "tests/test_harness.py",
     }
 )
@@ -60,20 +56,9 @@ def _create_directories(project_path: Path, project_name: str, quick: bool = Fal
     package_name = _to_package_name(project_name)
     dirs = [
         ".github/workflows",
-        ".harness/plans",
-        ".harness/eval_feedback",
-        ".harness/state",
         ".harness/templates",
-        ".harness/logs",
-        "configs",
         "docs",
-        "docs/decisions",
-        "scripts",
         f"src/{package_name}",
-        f"src/{package_name}/harness",
-        f"src/{package_name}/agents",
-        f"src/{package_name}/tools",
-        f"src/{package_name}/utils",
         "tests",
     ]
     for d in dirs:
@@ -158,9 +143,6 @@ def _create_source_files(project_path: Path, project_name: str, quick: bool = Fa
     """创建初始 Python 源码和测试文件。"""
     package_name = _to_package_name(project_name)
     pkg_dir = project_path / "src" / package_name
-    if not quick:
-        for sub in ["harness", "agents", "tools", "utils"]:
-            (pkg_dir / sub / "__init__.py").write_text("", encoding="utf-8")
     (project_path / "tests" / "__init__.py").write_text("", encoding="utf-8")
     (pkg_dir / "__init__.py").write_text(
         f'"""{package_name} package."""\n\n__version__ = "0.1.0"\n',

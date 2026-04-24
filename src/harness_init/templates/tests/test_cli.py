@@ -1,7 +1,5 @@
 """Tests for cli.py."""
 
-import json
-
 from typer.testing import CliRunner
 
 from {package_name}.cli import app
@@ -9,43 +7,29 @@ from {package_name}.cli import app
 runner = CliRunner()
 
 
-def test_status_shows_stage() -> None:
-    """status should show current workflow stage."""
-    result = runner.invoke(app, ["status"])
+def test_hello_default() -> None:
+    """hello should print greeting with default name."""
+    result = runner.invoke(app, ["hello"])
     assert result.exit_code == 0
-    assert "Current stage:" in result.output
+    assert "Hello, World!" in result.output
 
 
-def test_run_executes_plan(tmp_path) -> None:
-    """run should execute a plan and save result."""
-    plan = {
-        "id": "plan_test",
-        "tasks": [
-            {"id": "t1", "name": "Hello", "command": "echo hello"},
-        ],
-    }
-    plan_path = tmp_path / "plan.json"
-    plan_path.write_text(json.dumps(plan), encoding="utf-8")
-
-    result = runner.invoke(app, ["run", str(plan_path)])
+def test_hello_with_name() -> None:
+    """hello should print greeting with provided name."""
+    result = runner.invoke(app, ["hello", "Alice"])
     assert result.exit_code == 0
-    assert "Plan executed:" in result.output
-    assert "plan_test" in result.output
+    assert "Hello, Alice!" in result.output
 
 
-def test_evaluate_reads_result(tmp_path) -> None:
-    """evaluate should read result and produce feedback."""
-    result_data = {
-        "plan_id": "plan_test",
-        "status": "success",
-        "tasks": [
-            {"id": "t1", "status": "success", "error": None},
-        ],
-    }
-    result_path = tmp_path / "result.json"
-    result_path.write_text(json.dumps(result_data), encoding="utf-8")
-
-    result = runner.invoke(app, ["evaluate", str(result_path)])
+def test_version_flag() -> None:
+    """--version should print version and exit."""
+    result = runner.invoke(app, ["--version"])
     assert result.exit_code == 0
-    assert "Score:" in result.output
-    assert "Passed:" in result.output
+    assert "0.1.0" in result.output
+
+
+def test_version_short_flag() -> None:
+    """-v should print version and exit."""
+    result = runner.invoke(app, ["-v"])
+    assert result.exit_code == 0
+    assert "0.1.0" in result.output

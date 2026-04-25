@@ -5,4 +5,4 @@ try:
 
     __version__ = version("harness-init")
 except Exception:  # pragma: no cover
-    __version__ = "0.1.0"
+    __version__ = "1.1.6"

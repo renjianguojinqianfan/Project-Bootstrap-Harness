@@ -47,3 +47,5 @@ htmlcov/
 
 # Working drafts
 改进计划草稿.md
+.config/
+.sisyphus/

@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.6] - 2026-04-26
+
+### Added
+
+- `docs/DESIGN.md`: 核心设计哲学与架构决策归档。
+- `CONTRIBUTING.md`: 贡献指南，将 PBH 协议要求融入贡献流程。
+
+### Changed
+
+- `pyproject.toml` 和 `__init__.py` 版本号同步至 1.1.6。
+
 ## [1.1.0] - 2026-04-24
 
 ### Changed
@@ -108,3 +119,5 @@ These items were originally planned as incremental releases but were consolidate
 - Initial release of `harness-init`.
 - CLI tool to scaffold complete, harness-ready Python projects.
 - Generated projects include: package structure, CLI, tests, Harness runtime, Git init, `make verify` pipeline.
+
+> **Note**: v1.1.1 ~ v1.1.5 为 PyPI 发布流程修复与模板清理，记录待 v1.5.0 发布时补全。

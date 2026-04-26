@@ -451,3 +451,13 @@ def test_init_project_ide_all(tmp_path: Path) -> None:
     assert (project_path / "opencode.yaml").exists()
     assert (project_path / ".trae").exists()
     assert (project_path / ".github" / "copilot-instructions.md").exists()
+
+
+def test_init_project_creates_known_pitfalls(tmp_path: Path) -> None:
+    """应创建 .harness/known_pitfalls.md。"""
+    project_path = tmp_path / "pitfalls-project"
+    init_project(str(project_path))
+    pitfalls = project_path / ".harness" / "known_pitfalls.md"
+    assert pitfalls.exists()
+    content = pitfalls.read_text(encoding="utf-8")
+    assert "Known Pitfalls" in content

@@ -54,20 +54,41 @@ def _resolve_quick_variant(
     return rel
 
 
-def _copy_single_file(
-    src: Path,
-    dst: Path,
+def _copy_template_source(
+    source_dir: Path,
+    project_path: Path,
     project_name: str,
+    package_name: str,
+    quick: bool,
+    is_excluded: Callable[[str], bool] | None,
     description: str,
     author: str,
     email: str,
+    quick_bases: set[str] | None = None,
 ) -> None:
-    """复制/渲染单个模板文件并设置权限。"""
-    dst.parent.mkdir(parents=True, exist_ok=True)
-    _copy_or_render_template(src, dst, project_name, description, author, email)
-    dst.chmod(src.stat().st_mode)
-    if dst.suffix == ".sh" and os.name != "nt":
-        dst.chmod(0o755)
+    """从单个模板源目录复制文件。"""
+    if quick_bases is None:
+        quick_bases = _gather_quick_bases(source_dir)
+
+    for src in source_dir.rglob("*"):
+        if _should_skip(src):
+            continue
+
+        rel = src.relative_to(source_dir)
+        resolved = _resolve_quick_variant(src, rel, quick, quick_bases)
+        if resolved is None:
+            continue
+
+        rel_str = str(resolved).replace("\\", "/").replace("{package_name}", package_name)
+        if quick and is_excluded is not None and is_excluded(rel_str):
+            continue
+
+        dst = project_path / rel_str
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        _copy_or_render_template(src, dst, project_name, description, author, email)
+        dst.chmod(src.stat().st_mode)
+        if dst.suffix == ".sh" and os.name != "nt":
+            dst.chmod(0o755)
 
 
 def copy_templates(
@@ -81,22 +102,15 @@ def copy_templates(
     email: str = "",
     quick: bool = False,
     is_excluded: Callable[[str], bool] | None = None,
+    common_dir: Path | None = None,
 ) -> None:
-    """复制模板文件到项目目录（递归）。"""
-    quick_bases = _gather_quick_bases(templates_dir)
-
-    for src in templates_dir.rglob("*"):
-        if _should_skip(src):
-            continue
-
-        rel = src.relative_to(templates_dir)
-        resolved = _resolve_quick_variant(src, rel, quick, quick_bases)
-        if resolved is None:
-            continue
-
-        rel_str = str(resolved).replace("\\", "/").replace("{package_name}", package_name)
-        if quick and is_excluded is not None and is_excluded(rel_str):
-            continue
-
-        dst = project_path / rel_str
-        _copy_single_file(src, dst, project_name, description, author, email)
+    """复制模板文件到项目目录（递归）。先复制 common，再复制 type-specific。"""
+    if common_dir is not None:
+        _copy_template_source(
+            common_dir, project_path, project_name, package_name,
+            quick, is_excluded, description, author, email,
+        )
+    _copy_template_source(
+        templates_dir, project_path, project_name, package_name,
+        quick, is_excluded, description, author, email,
+    )

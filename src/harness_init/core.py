@@ -31,9 +31,14 @@ _QUICK_MODE_EXCLUSIONS: frozenset[str] = frozenset(
 )
 
 
-def _get_templates_dir() -> Path:
-    """返回模板资源目录。"""
-    return Path(__file__).parent / "templates"
+def _get_templates_dir(template: str = "cli") -> Path:
+    """返回类型特定模板目录。"""
+    return Path(__file__).parent / "templates" / template
+
+
+def _get_common_templates_dir() -> Path:
+    """返回共享模板目录。"""
+    return Path(__file__).parent / "templates" / "common"
 
 
 def _is_excluded_quick(rel_path: str, package_name: str) -> bool:
@@ -50,17 +55,20 @@ def _is_excluded_quick(rel_path: str, package_name: str) -> bool:
     return False
 
 
-def _create_directories(project_path: Path, project_name: str, quick: bool = False) -> None:
+def _create_directories(project_path: Path, project_name: str, quick: bool = False, template: str = "cli") -> None:
     """创建项目标准目录结构。"""
     package_name = _to_package_name(project_name)
     dirs = [
         ".github/workflows",
         ".harness/templates",
         "docs",
-        f"src/{package_name}",
         "tasks",
         "tests",
     ]
+    if template == "notebook":
+        dirs.append("notebooks")
+    else:
+        dirs.append(f"src/{package_name}")
     for d in dirs:
         if quick and _is_excluded_quick(d + "/", package_name):
             continue
@@ -74,11 +82,12 @@ def _copy_templates(
     author: str = "",
     email: str = "",
     quick: bool = False,
+    template: str = "cli",
 ) -> None:
     """复制模板文件到项目目录（递归）。"""
     package_name = _to_package_name(project_name)
     copy_templates(
-        _get_templates_dir(),
+        _get_templates_dir(template),
         project_path,
         project_name,
         package_name,
@@ -87,14 +96,17 @@ def _copy_templates(
         email=email,
         quick=quick,
         is_excluded=lambda rel_str: _is_excluded_quick(rel_str, package_name),
+        common_dir=_get_common_templates_dir(),
     )
 
 
-def _create_source_files(project_path: Path, project_name: str, quick: bool = False) -> None:
+def _create_source_files(project_path: Path, project_name: str, quick: bool = False, template: str = "cli") -> None:
     """创建初始 Python 源码和测试文件。"""
     package_name = _to_package_name(project_name)
-    pkg_dir = project_path / "src" / package_name
     (project_path / "tests" / "__init__.py").write_text("", encoding="utf-8")
+    if template == "notebook":
+        return
+    pkg_dir = project_path / "src" / package_name
     (pkg_dir / "__init__.py").write_text(
         f'"""{package_name} package."""\n\n__version__ = "0.1.0"\n',
         encoding="utf-8",
@@ -138,11 +150,12 @@ def _setup_project(
     author: str,
     email: str,
     quick: bool = False,
+    template: str = "cli",
 ) -> None:
     """创建目录、复制模板并生成初始源码。"""
-    _create_directories(path, project_name, quick=quick)
-    _copy_templates(path, project_name, description, author, email, quick=quick)
-    _create_source_files(path, project_name, quick=quick)
+    _create_directories(path, project_name, quick=quick, template=template)
+    _copy_templates(path, project_name, description, author, email, quick=quick, template=template)
+    _create_source_files(path, project_name, quick=quick, template=template)
     _create_progress_json(path, path.name)
 
 
@@ -166,6 +179,7 @@ def init_project(
     author: str = "",
     email: str = "",
     quick: bool = False,
+    template: str = "cli",
 ) -> None:
     """初始化新项目。
 
@@ -177,9 +191,10 @@ def init_project(
         author: 作者名。
         email: 作者邮箱。
         quick: 是否使用快速模式生成最小项目。
+        template: 项目模板类型（cli, lib, web, notebook）。
     """
     path = Path(project_path)
     _prepare_project_path(path, force)
-    _setup_project(path, path.name, description, author, email, quick=quick)
+    _setup_project(path, path.name, description, author, email, quick=quick, template=template)
     if not no_git:
         _init_git_safe(path, author, email)

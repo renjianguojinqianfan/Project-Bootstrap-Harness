@@ -46,8 +46,17 @@ PBH plants that protocol, quality gates, and state tracking into your project th
 ```bash
 pip install harness-init
 
-# Full mode
+# Full mode (default CLI template)
 harness-init my-awesome-project
+
+# Choose project type
+harness-init my-library --template=lib --yes
+harness-init my-api --template=web --yes
+harness-init my-analysis --template=notebook --yes
+
+# Choose IDE config (default: all)
+harness-init my-project --ide=cursor --yes    # Cursor only
+harness-init my-project --ide=none --yes      # No IDE configs
 
 # Quick mode (minimal, 5-minute onboarding)
 harness-init my-project --quick --yes
@@ -157,8 +166,8 @@ Both modes include: `AGENTS.md`, `Makefile` (verify/test/lint), `tests/` directo
 ## Roadmap
 
 - **v1.1.0**: Remove out-of-scope features, rewrite AGENTS.md as "airport navigation", establish clear boundaries
-- **v1.5.0**: `--ide` parameter (on-demand IDE adapter files), `--template` parameter (lib/web/notebook project types)
-- **v2.0.0**: Multi-agent native support, ecosystem interfaces, official universal protocol announcement
+- **v1.5.0** ✅: `--ide` parameter (on-demand IDE adapter files), `--template` parameter (cli/lib/web/notebook project types), `.harness/known_pitfalls.md`
+- **v2.0.0**: Multi-agent native support, ecosystem interfaces (Harness-Lint), official universal protocol announcement
 
 This project is maintained by an individual in spare time. The roadmap adjusts dynamically based on priorities.
 

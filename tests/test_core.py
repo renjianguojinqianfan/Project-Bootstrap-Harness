@@ -418,3 +418,36 @@ def test_init_project_invalid_template(tmp_path: Path) -> None:
     """无效模板应引发 ValueError。"""
     with pytest.raises(ValueError, match="Unknown template"):
         init_project(str(tmp_path / "bad-project"), template="invalid")
+
+
+def test_init_project_ide_cursor_only(tmp_path: Path) -> None:
+    """ide=cursor 应只保留 Cursor 配置。"""
+    project_path = tmp_path / "cursor-project"
+    init_project(str(project_path), ide="cursor")
+    assert (project_path / ".cursorrules").exists()
+    assert not (project_path / "CLAUDE.md").exists()
+    assert not (project_path / "opencode.yaml").exists()
+    assert not (project_path / ".trae").exists()
+    assert not (project_path / ".github" / "copilot-instructions.md").exists()
+
+
+def test_init_project_ide_none(tmp_path: Path) -> None:
+    """ide=none 应排除所有 IDE 配置。"""
+    project_path = tmp_path / "none-project"
+    init_project(str(project_path), ide="none")
+    assert not (project_path / ".cursorrules").exists()
+    assert not (project_path / "CLAUDE.md").exists()
+    assert not (project_path / "opencode.yaml").exists()
+    assert not (project_path / ".trae").exists()
+    assert not (project_path / ".github" / "copilot-instructions.md").exists()
+
+
+def test_init_project_ide_all(tmp_path: Path) -> None:
+    """ide=all 应保留所有 IDE 配置。"""
+    project_path = tmp_path / "all-project"
+    init_project(str(project_path), ide="all")
+    assert (project_path / ".cursorrules").exists()
+    assert (project_path / "CLAUDE.md").exists()
+    assert (project_path / "opencode.yaml").exists()
+    assert (project_path / ".trae").exists()
+    assert (project_path / ".github" / "copilot-instructions.md").exists()

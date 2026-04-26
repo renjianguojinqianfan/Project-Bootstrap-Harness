@@ -80,7 +80,7 @@ def _copy_template_source(
             continue
 
         rel_str = str(resolved).replace("\\", "/").replace("{package_name}", package_name)
-        if quick and is_excluded is not None and is_excluded(rel_str):
+        if is_excluded is not None and is_excluded(rel_str):
             continue
 
         dst = project_path / rel_str

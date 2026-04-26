@@ -21,6 +21,7 @@ def _run_init(
     email: str = "",
     quick: bool = False,
     template: str = "cli",
+    ide: str = "all",
 ) -> None:
     """纯 Python 入口，供 CLI 和测试直接调用。"""
     kwargs = {}
@@ -34,6 +35,7 @@ def _run_init(
     kwargs["author"] = author
     kwargs["email"] = email
     kwargs["template"] = template
+    kwargs["ide"] = ide
     init_project(project_name, **kwargs)
 
 
@@ -51,7 +53,12 @@ def main(
     ),
     yes: bool = typer.Option(False, "--yes", "-y", help="跳过交互提示，使用默认值。"),
     quick: bool = typer.Option(False, "--quick", "-q", help="生成精简项目（无 CI/文档/钩子/IDE 配置）。"),
-    template: str = typer.Option("cli", "--template", "-t", help="项目模板类型（cli, lib, web, notebook）。"),
+    template: str = typer.Option(
+        "cli", "--template", "-t", help="项目模板类型（cli, lib, web, notebook）。"
+    ),
+    ide: str = typer.Option(
+        "all", "--ide", help="IDE 配置模式（all, none, cursor, claude, trae, copilot, opencode）。"
+    ),
 ) -> None:
     """初始化一个新的 Harness Engineering 项目。"""
     description = "" if yes else typer.prompt("Project description", default="")
@@ -66,6 +73,7 @@ def main(
         email=email,
         quick=quick,
         template=template,
+        ide=ide,
     )
 
 

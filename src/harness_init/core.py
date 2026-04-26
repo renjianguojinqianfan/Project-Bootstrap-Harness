@@ -15,6 +15,14 @@ from harness_init._utils import (
 
 _VALID_TEMPLATES: frozenset[str] = frozenset({"cli", "lib", "web", "notebook"})
 
+_IDE_FILE_MAP: dict[str, str] = {
+    "cursor": ".cursorrules",
+    "claude": "CLAUDE.md",
+    "trae": ".trae/",
+    "copilot": ".github/copilot-instructions.md",
+    "opencode": "opencode.yaml",
+}
+
 _QUICK_MODE_EXCLUSIONS: frozenset[str] = frozenset(
     {
         "CLAUDE.md",
@@ -50,6 +58,36 @@ def _get_templates_dir(template: str = "cli") -> Path:
 def _get_common_templates_dir() -> Path:
     """返回共享模板目录。"""
     return Path(__file__).parent / "templates" / "common"
+
+
+def _is_ide_file(rel_path: str) -> bool:
+    """检查路径是否匹配任何 IDE 配置文件模式。"""
+    for pattern in _IDE_FILE_MAP.values():
+        if pattern.endswith("/"):
+            if rel_path.startswith(pattern) or rel_path.startswith(pattern.rstrip("/")):
+                return True
+        else:
+            if rel_path == pattern:
+                return True
+    return False
+
+
+def _is_excluded_ide(rel_path: str, ide: str) -> bool:
+    """如果文件是 IDE 配置且不被当前 ide 模式保留，返回 True。"""
+    if ide == "all":
+        return False
+    if ide == "none":
+        return _is_ide_file(rel_path)
+    if ide in _IDE_FILE_MAP:
+        target = _IDE_FILE_MAP[ide]
+        if target.endswith("/"):
+            if rel_path.startswith(target) or rel_path.startswith(target.rstrip("/")):
+                return False
+        else:
+            if rel_path == target:
+                return False
+        return _is_ide_file(rel_path)
+    return False
 
 
 def _is_excluded_quick(rel_path: str, package_name: str) -> bool:
@@ -94,9 +132,16 @@ def _copy_templates(
     email: str = "",
     quick: bool = False,
     template: str = "cli",
+    ide: str = "all",
 ) -> None:
     """复制模板文件到项目目录（递归）。"""
     package_name = _to_package_name(project_name)
+
+    def _is_excluded(rel_str: str) -> bool:
+        if quick and _is_excluded_quick(rel_str, package_name):
+            return True
+        return _is_excluded_ide(rel_str, ide)
+
     copy_templates(
         _get_templates_dir(template),
         project_path,
@@ -106,7 +151,7 @@ def _copy_templates(
         author=author,
         email=email,
         quick=quick,
-        is_excluded=lambda rel_str: _is_excluded_quick(rel_str, package_name),
+        is_excluded=_is_excluded,
         common_dir=_get_common_templates_dir(),
     )
 
@@ -162,10 +207,11 @@ def _setup_project(
     email: str,
     quick: bool = False,
     template: str = "cli",
+    ide: str = "all",
 ) -> None:
     """创建目录、复制模板并生成初始源码。"""
     _create_directories(path, project_name, quick=quick, template=template)
-    _copy_templates(path, project_name, description, author, email, quick=quick, template=template)
+    _copy_templates(path, project_name, description, author, email, quick=quick, template=template, ide=ide)
     _create_source_files(path, project_name, quick=quick, template=template)
     _create_progress_json(path, path.name)
 
@@ -191,6 +237,7 @@ def init_project(
     email: str = "",
     quick: bool = False,
     template: str = "cli",
+    ide: str = "all",
 ) -> None:
     """初始化新项目。
 
@@ -203,10 +250,11 @@ def init_project(
         email: 作者邮箱。
         quick: 是否使用快速模式生成最小项目。
         template: 项目模板类型（cli, lib, web, notebook）。
+        ide: IDE 配置模式（all, none, cursor, claude, trae, copilot, opencode）。
     """
     path = Path(project_path)
     _validate_template(template)
     _prepare_project_path(path, force)
-    _setup_project(path, path.name, description, author, email, quick=quick, template=template)
+    _setup_project(path, path.name, description, author, email, quick=quick, template=template, ide=ide)
     if not no_git:
         _init_git_safe(path, author, email)

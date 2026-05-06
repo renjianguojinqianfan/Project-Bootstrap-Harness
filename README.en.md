@@ -32,7 +32,8 @@ PBH plants that protocol, quality gates, and state tracking into your project th
 - **Quality gate infrastructure**: `make verify` works out of the box — lint, tests, and coverage in one command
 - **An observable Agent behavior benchmark**: The same `AGENTS.md` lets you observe how different AI tools follow rules and perform
 - **A Spec Coding container**: Provides the `tasks/` directory for you to break down work; content is entirely up to you
-
+- **A "protocol seeder"**: Seeds rules on project creation so constraints travel with the project, not the developer.
+- **An ecosystem protocol standard**: See `docs/spec/PBH-SPEC.md` — defines universal conventions for AI project collaboration, implementable in any language.
 ### ❌ PBH Is NOT
 
 - **Not an Agent framework**: Does not define AI roles or implement multi-agent orchestration
@@ -167,11 +168,18 @@ Both modes include: `AGENTS.md`, `Makefile` (verify/test/lint), `tests/` directo
 
 - **v1.1.0**: Remove out-of-scope features, rewrite AGENTS.md as "airport navigation", establish clear boundaries
 - **v1.5.0** ✅: `--ide` parameter (on-demand IDE adapter files), `--template` parameter (cli/lib/web/notebook project types), `.harness/known_pitfalls.md`
-- **v2.0.0**: Multi-agent native support, ecosystem interfaces (Harness-Lint), official universal protocol announcement
+- **v2.0.0**: Cross-language support based on PBH-SPEC, ecosystem interfaces (Harness-Lint), official universal protocol announcement
 
 This project is maintained by an individual in spare time. The roadmap adjusts dynamically based on priorities.
 
 ---
+
+## Ecosystem
+
+| Tool | Description |
+|------|-------------|
+| [Harness-Lint](https://github.com/renjianguojinqianfan/harness-lint) | Protocol verifier for PBH ecosystem, covering 7 AI code defect rules with attribution-anchored reports |
+| [PBH-SPEC](https://github.com/renjianguojinqianfan/Project-Bootstrap-Harness/blob/master/docs/spec/PBH-SPEC.md) | AI project collaboration protocol standard draft (EN/ZH), community contributions welcome |
 
 ## Acknowledgments
 
@@ -179,7 +187,7 @@ This project is maintained by an individual in spare time. The roadmap adjusts d
 - [Ruff](https://docs.astral.sh/ruff/) — Blazingly fast Python linter
 - [Pytest](https://docs.pytest.org/) — Reliable testing framework
 
-Inspiration: Anthropic's Agentic Workflow and Context Engineering practices, OpenAI's Harness Engineering philosophy
+Inspiration: Anthropic's Agentic Workflow and Context Engineering practices, OpenAI's Harness Engineering philosophy and Symphony project
 
 ## License
 

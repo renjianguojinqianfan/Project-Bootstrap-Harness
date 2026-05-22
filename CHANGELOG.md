@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2026-05-23
+
+### Added
+
+- `harness-init validate` 命令：检查项目是否符合 PBH v2.0 协议规范。
+  - 文件存在性检查：`AGENTS.md`、`Makefile`（含 verify target）、`.harness/progress.json`。
+  - 内容合规性检查：AGENTS.md 的 5 个必须章节、Quick Start 首步必须是 `make verify`、Critical Rules 三项禁令、progress.json schema 验证。
+  - 行为合规性检查：运行 `make verify` 并验证退出码。
+- `harness-init doctor` 命令：检查本地开发环境是否满足 PBH 协作前提条件（make、git、python、pip）。
+- `src/harness_init/validation.py`：新增合规性验证模块，包含 `validate_project()` 和 `check_doctor()` 核心函数。
+- `tests/test_validation.py`：新增 30+ 测试用例覆盖所有验证逻辑。
+
+### Changed
+
+- `src/harness_init/cli.py`：从单命令 `typer.run()` 重构为多命令 `typer.Typer()` 应用，支持 init/validate/doctor 子命令。
+- `pyproject.toml`：版本号升级至 2.0.0。
+- `docs/spec/PBH-SPEC.md`：协议状态从 Draft 更新为 Released。
+- `README.md`：更新路线图，标记 v2.0.0 为已完成。
+
 ## [1.5.1] - 2026-04-27
 
 ### Fixed

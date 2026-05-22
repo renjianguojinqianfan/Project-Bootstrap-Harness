@@ -1,8 +1,8 @@
 # PBH Protocol Specification (PBH-SPEC)
 
-**Version**: v2.0.0-draft
-**Status**: Draft, Pending Finalization
-**Release Date**: 2026-05-06
+**Version**: v2.0.0
+**Status**: Released
+**Release Date**: 2026-05-23
 **Highlights**: Defines the standardized project "Collaboration Constitution" and core protocols, marking PBH's evolution from a "tool" to a "universal standard."
 
 ## Core Principles

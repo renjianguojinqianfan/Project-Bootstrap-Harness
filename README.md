@@ -169,7 +169,7 @@ PBH 不定义 AI 角色，不强制特定工作流。它提供的是一个所有
 
 - **v1.1.0**：砍掉越界功能，重写 AGENTS.md 为"机场导航"式，确立清晰边界
 - **v1.5.0** ✅：支持 `--ide` 参数（按需生成 IDE 适配文件）、`--template` 参数（cli/lib/web/notebook 多项目类型）、`.harness/known_pitfalls.md`
-- **v2.0.0**：多智能体原生支持、生态接口（Harness-Lint）、正式宣告通用协议定位
+- **v2.0.0** ✅：PBH-SPEC v2.0 协议标准发布、`validate`/`doctor` 合规性验证命令、正式宣告通用协议定位
 
 本项目由个人业余维护，路线图按优先级动态调整。
 

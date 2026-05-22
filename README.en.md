@@ -168,7 +168,7 @@ Both modes include: `AGENTS.md`, `Makefile` (verify/test/lint), `tests/` directo
 
 - **v1.1.0**: Remove out-of-scope features, rewrite AGENTS.md as "airport navigation", establish clear boundaries
 - **v1.5.0** ✅: `--ide` parameter (on-demand IDE adapter files), `--template` parameter (cli/lib/web/notebook project types), `.harness/known_pitfalls.md`
-- **v2.0.0**: Cross-language support based on PBH-SPEC, ecosystem interfaces (Harness-Lint), official universal protocol announcement
+- **v2.0.0** ✅: PBH-SPEC v2.0 protocol standard released, `validate`/`doctor` compliance verification commands, official universal protocol announcement
 
 This project is maintained by an individual in spare time. The roadmap adjusts dynamically based on priorities.
 

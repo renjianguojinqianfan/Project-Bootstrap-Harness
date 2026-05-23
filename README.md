@@ -180,6 +180,7 @@ PBH 不定义 AI 角色，不强制特定工作流。它提供的是一个所有
 | 工具 | 说明 |
 |------|------|
 | [Harness-Lint](https://github.com/renjianguojinqianfan/harness-lint) | PBH 生态的协议校验工具，覆盖 7 条 AI 代码缺陷规则，提供归因锚定报告 |
+| [Harness Agent](https://github.com/renjianguojinqianfan/harness-agent) | PBH 协议驱动的自主代码修复代理，形成发现→诊断→修复→审查→验证的完整闭环 |
 | [PBH-SPEC](https://github.com/renjianguojinqianfan/Project-Bootstrap-Harness/blob/master/docs/spec/PBH-SPEC.md) | AI 项目协作协议标准草案（中英文），欢迎社区参与讨论与实现 |
 
 ## 致谢

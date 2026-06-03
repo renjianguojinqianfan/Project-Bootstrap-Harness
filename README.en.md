@@ -178,7 +178,7 @@ This project is maintained by an individual in spare time. The roadmap adjusts d
 
 | Tool | Description |
 |------|-------------|
-| [Harness-Lint](https://github.com/renjianguojinqianfan/harness-lint) | Protocol verifier for PBH ecosystem, covering 7 AI code defect rules with attribution-anchored reports |
+| [Harness-Lint](https://github.com/renjianguojinqianfan/harness-lint) | Protocol verifier for PBH ecosystem, covering 9 AI code defect rules with attribution-anchored reports |
 | [Harness Agent](https://github.com/renjianguojinqianfan/harness-agent) | Autonomous code-fixing agent driven by PBH protocol, forming a complete loop of discover→diagnose→fix→review→verify |
 | [PBH-SPEC](https://github.com/renjianguojinqianfan/Project-Bootstrap-Harness/blob/master/docs/spec/PBH-SPEC.md) | AI project collaboration protocol standard draft (EN/ZH), community contributions welcome |
 

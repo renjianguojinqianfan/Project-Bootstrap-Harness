@@ -6,6 +6,8 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from harness_init._git import _init_git, _on_remove_error
+from harness_init._ide import _is_excluded_ide
+from harness_init._quick import _is_excluded_quick
 from harness_init._templates import copy_templates
 from harness_init._utils import (
     _ensure_dir,
@@ -15,34 +17,9 @@ from harness_init._utils import (
 
 _VALID_TEMPLATES: frozenset[str] = frozenset({"cli", "lib", "web", "notebook"})
 
-_IDE_FILE_MAP: dict[str, str] = {
-    "cursor": ".cursorrules",
-    "claude": "CLAUDE.md",
-    "trae": ".trae/",
-    "copilot": ".github/copilot-instructions.md",
-    "opencode": "opencode.yaml",
-}
-
-_QUICK_MODE_EXCLUSIONS: frozenset[str] = frozenset(
-    {
-        "CLAUDE.md",
-        ".cursorrules",
-        "opencode.yaml",
-        ".github/",
-        ".pre-commit-config.yaml",
-        "docs/decisions/",
-        "docs/PROJECT_MAP.md",
-        "docs/context.md",
-        "scripts/",
-        "configs/",
-        "README.en.md",
-        "tests/test_harness.py",
-    }
-)
-
 
 def _validate_template(template: str) -> None:
-    """验证模板类型是否有效。"""
+    """Validate template type."""
     if template not in _VALID_TEMPLATES:
         raise ValueError(
             f"Unknown template '{template}'. "
@@ -51,61 +28,19 @@ def _validate_template(template: str) -> None:
 
 
 def _get_templates_dir(template: str = "cli") -> Path:
-    """返回类型特定模板目录。"""
+    """Return type-specific template directory."""
     return Path(__file__).parent / "templates" / template
 
 
 def _get_common_templates_dir() -> Path:
-    """返回共享模板目录。"""
+    """Return shared template directory."""
     return Path(__file__).parent / "templates" / "common"
 
 
-def _is_ide_file(rel_path: str) -> bool:
-    """检查路径是否匹配任何 IDE 配置文件模式。"""
-    for pattern in _IDE_FILE_MAP.values():
-        if pattern.endswith("/"):
-            if rel_path.startswith(pattern) or rel_path.startswith(pattern.rstrip("/")):
-                return True
-        else:
-            if rel_path == pattern:
-                return True
-    return False
-
-
-def _is_excluded_ide(rel_path: str, ide: str) -> bool:
-    """如果文件是 IDE 配置且不被当前 ide 模式保留，返回 True。"""
-    if ide == "all":
-        return False
-    if ide == "none":
-        return _is_ide_file(rel_path)
-    if ide in _IDE_FILE_MAP:
-        target = _IDE_FILE_MAP[ide]
-        if target.endswith("/"):
-            if rel_path.startswith(target) or rel_path.startswith(target.rstrip("/")):
-                return False
-        else:
-            if rel_path == target:
-                return False
-        return _is_ide_file(rel_path)
-    return False
-
-
-def _is_excluded_quick(rel_path: str, package_name: str) -> bool:
-    """判断相对路径是否在 quick 模式下被排除。"""
-    substituted = rel_path.replace("{package_name}", package_name)
-    for exclusion in _QUICK_MODE_EXCLUSIONS:
-        exc = exclusion.replace("{package_name}", package_name)
-        if exc.endswith("/"):
-            if substituted.startswith(exc) or substituted + "/" == exc:
-                return True
-        else:
-            if substituted == exc:
-                return True
-    return False
-
-
-def _create_directories(project_path: Path, project_name: str, quick: bool = False, template: str = "cli") -> None:
-    """创建项目标准目录结构。"""
+def _create_directories(
+    project_path: Path, project_name: str, quick: bool = False, template: str = "cli"
+) -> None:
+    """Create standard project directory structure."""
     package_name = _to_package_name(project_name)
     dirs = [
         ".github/workflows",
@@ -134,7 +69,7 @@ def _copy_templates(
     template: str = "cli",
     ide: str = "all",
 ) -> None:
-    """复制模板文件到项目目录（递归）。"""
+    """Copy template files into the project directory."""
     package_name = _to_package_name(project_name)
 
     def _is_excluded(rel_str: str) -> bool:
@@ -156,8 +91,10 @@ def _copy_templates(
     )
 
 
-def _create_source_files(project_path: Path, project_name: str, quick: bool = False, template: str = "cli") -> None:
-    """创建初始 Python 源码和测试文件。"""
+def _create_source_files(
+    project_path: Path, project_name: str, quick: bool = False, template: str = "cli"
+) -> None:
+    """Create initial Python source and test files."""
     package_name = _to_package_name(project_name)
     (project_path / "tests" / "__init__.py").write_text("", encoding="utf-8")
     if template == "notebook":
@@ -184,7 +121,7 @@ def _create_progress_json(project_path: Path, project_name: str) -> None:
 
 
 def _prepare_project_path(path: Path, force: bool) -> None:
-    """验证项目路径，必要时备份旧目录。"""
+    """Validate project path and backup old directory if needed."""
     project_name = path.name
     _validate_project_name(project_name)
     if ".." in path.parts:
@@ -209,15 +146,18 @@ def _setup_project(
     template: str = "cli",
     ide: str = "all",
 ) -> None:
-    """创建目录、复制模板并生成初始源码。"""
+    """Create directories, copy templates and generate initial source."""
     _create_directories(path, project_name, quick=quick, template=template)
-    _copy_templates(path, project_name, description, author, email, quick=quick, template=template, ide=ide)
+    _copy_templates(
+        path, project_name, description, author, email,
+        quick=quick, template=template, ide=ide,
+    )
     _create_source_files(path, project_name, quick=quick, template=template)
     _create_progress_json(path, path.name)
 
 
 def _init_git_safe(path: Path, author: str, email: str) -> None:
-    """安全地初始化 Git 仓库，失败时回滚。"""
+    """Safely initialize a Git repository, rolling back on failure."""
     try:
         _init_git(path, author, email)
     except Exception as exc:
@@ -239,22 +179,13 @@ def init_project(
     template: str = "cli",
     ide: str = "all",
 ) -> None:
-    """初始化新项目。
-
-    Args:
-        project_path: 项目目标路径。
-        force: 是否强制覆盖已存在目录。
-        no_git: 是否跳过 Git 初始化。
-        description: 项目描述。
-        author: 作者名。
-        email: 作者邮箱。
-        quick: 是否使用快速模式生成最小项目。
-        template: 项目模板类型（cli, lib, web, notebook）。
-        ide: IDE 配置模式（all, none, cursor, claude, trae, copilot, opencode）。
-    """
+    """Initialize a new Harness Engineering project."""
     path = Path(project_path)
     _validate_template(template)
     _prepare_project_path(path, force)
-    _setup_project(path, path.name, description, author, email, quick=quick, template=template, ide=ide)
+    _setup_project(
+        path, path.name, description, author, email,
+        quick=quick, template=template, ide=ide,
+    )
     if not no_git:
         _init_git_safe(path, author, email)

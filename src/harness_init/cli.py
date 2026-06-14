@@ -41,19 +41,30 @@ def _run_init(
     ide: str = "all",
 ) -> None:
     """纯 Python 入口，供 CLI 和测试直接调用。"""
-    kwargs = {}
+    kwargs = {
+        "description": description,
+        "author": author,
+        "email": email,
+        "template": template,
+        "ide": ide,
+    }
     if force:
         kwargs["force"] = True
     if no_git:
         kwargs["no_git"] = True
     if quick:
         kwargs["quick"] = True
-    kwargs["description"] = description
-    kwargs["author"] = author
-    kwargs["email"] = email
-    kwargs["template"] = template
-    kwargs["ide"] = ide
     init_project(project_name, **kwargs)
+
+
+def _prompt_metadata(yes: bool) -> tuple[str, str, str]:
+    """Prompt for project metadata unless --yes is set."""
+    if yes:
+        return "", "", ""
+    description = typer.prompt("Project description", default="")
+    author = typer.prompt("Author name", default="")
+    email = typer.prompt("Author email", default="")
+    return description, author, email
 
 
 @app.command()
@@ -62,27 +73,16 @@ def init(
     force: bool = typer.Option(False, "--force", "-f", help="强制覆盖已存在目录。"),
     no_git: bool = typer.Option(False, "--no-git", help="跳过 Git 初始化。"),
     yes: bool = typer.Option(False, "--yes", "-y", help="跳过交互提示，使用默认值。"),
-    quick: bool = typer.Option(False, "--quick", "-q", help="生成精简项目（无 CI/文档/钩子/IDE 配置）。"),
+    quick: bool = typer.Option(False, "--quick", "-q", help="生成精简项目。"),
     template: str = typer.Option(
-        "cli",
-        "--template",
-        "-t",
-        help="项目模板类型。可选: cli (默认), lib, web, notebook。",
+        "cli", "--template", "-t", help="项目模板类型（cli/lib/web/notebook）。"
     ),
     ide: str = typer.Option(
-        "all",
-        "--ide",
-        help=(
-            "生成特定 IDE 配置文件。"
-            "可选: all (默认，生成全部), none (不生成), "
-            "cursor, claude, trae, copilot, opencode。"
-        ),
+        "all", "--ide", help="IDE 配置模式（all/none/cursor/claude/trae/copilot/opencode）。"
     ),
 ) -> None:
     """初始化一个新的 Harness Engineering 项目。"""
-    description = "" if yes else typer.prompt("Project description", default="")
-    author = "" if yes else typer.prompt("Author name", default="")
-    email = "" if yes else typer.prompt("Author email", default="")
+    description, author, email = _prompt_metadata(yes)
     _run_init(
         project_name,
         force=force,
@@ -149,35 +149,19 @@ def main(
     force: bool = typer.Option(False, "--force", "-f", help="强制覆盖已存在目录。"),
     no_git: bool = typer.Option(False, "--no-git", help="跳过 Git 初始化。"),
     version: bool = typer.Option(
-        False,
-        "--version",
-        "-v",
-        help="Show version and exit。",
-        is_eager=True,
-        callback=_version_callback,
+        False, "--version", "-v", help="Show version and exit。", is_eager=True, callback=_version_callback
     ),
     yes: bool = typer.Option(False, "--yes", "-y", help="跳过交互提示，使用默认值。"),
-    quick: bool = typer.Option(False, "--quick", "-q", help="生成精简项目（无 CI/文档/钩子/IDE 配置）。"),
+    quick: bool = typer.Option(False, "--quick", "-q", help="生成精简项目。"),
     template: str = typer.Option(
-        "cli",
-        "--template",
-        "-t",
-        help="项目模板类型。可选: cli (默认), lib, web, notebook。",
+        "cli", "--template", "-t", help="项目模板类型（cli/lib/web/notebook）。"
     ),
     ide: str = typer.Option(
-        "all",
-        "--ide",
-        help=(
-            "生成特定 IDE 配置文件。"
-            "可选: all (默认，生成全部), none (不生成), "
-            "cursor, claude, trae, copilot, opencode。"
-        ),
+        "all", "--ide", help="IDE 配置模式（all/none/cursor/claude/trae/copilot/opencode）。"
     ),
 ) -> None:
     """初始化一个新的 Harness Engineering 项目。"""
-    description = "" if yes else typer.prompt("Project description", default="")
-    author = "" if yes else typer.prompt("Author name", default="")
-    email = "" if yes else typer.prompt("Author email", default="")
+    description, author, email = _prompt_metadata(yes)
     _run_init(
         project_name,
         force=force,

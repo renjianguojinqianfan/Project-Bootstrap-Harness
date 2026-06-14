@@ -5,12 +5,14 @@ import stat
 import subprocess
 from pathlib import Path
 
+_GIT_ERROR_FMT = "git {args} failed: {stderr}"
+
 
 def _git(project_path: Path, *args: str) -> None:
     """运行 Git 命令，失败时抛出包含 stderr 的异常。"""
     result = subprocess.run(["git", *args], cwd=project_path, capture_output=True, text=True)
     if result.returncode != 0:
-        raise RuntimeError(f"git {' '.join(args)} failed: {result.stderr.strip()}")
+        raise RuntimeError(_GIT_ERROR_FMT.format(args=" ".join(args), stderr=result.stderr.strip()))
 
 
 def _init_git(project_path: Path, author: str = "", email: str = "") -> None:

@@ -4,6 +4,9 @@ import re
 from datetime import UTC, datetime
 from pathlib import Path
 
+_PROJECT_NAME_RE = re.compile(r"^[a-zA-Z_][a-zA-Z0-9_-]*$")
+_PEP508_INVALID_RE = re.compile(r"[^A-Za-z0-9._-]")
+
 
 def _validate_project_name(project_name: str) -> None:
     """验证项目名非空且不包含非法路径字符。"""
@@ -11,7 +14,7 @@ def _validate_project_name(project_name: str) -> None:
         raise ValueError("Project name cannot be empty.")
     if any(c in project_name for c in ("/", "\\", "..")):
         raise ValueError("Project name cannot contain path separators or '..'.")
-    if not re.match(r"^[a-zA-Z_][a-zA-Z0-9_-]*$", project_name):
+    if not _PROJECT_NAME_RE.match(project_name):
         raise ValueError(
             "Project name must start with a letter or underscore "
             "and contain only letters, digits, hyphens, and underscores."
@@ -33,7 +36,7 @@ def _to_package_name(project_name: str) -> str:
 
 def _to_pep508_name(project_name: str) -> str:
     """将项目名转换为合法的 PEP 508 标识符。"""
-    sanitized = re.sub(r"[^A-Za-z0-9._-]", "-", project_name)
+    sanitized = _PEP508_INVALID_RE.sub("-", project_name)
     sanitized = sanitized.lstrip("._-")
     if not sanitized:
         sanitized = "project"

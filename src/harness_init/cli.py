@@ -1,5 +1,7 @@
 """CLI entry for harness-init."""
 
+from typing import TypedDict
+
 import typer
 
 from harness_init import __version__
@@ -7,6 +9,19 @@ from harness_init.core import init_project
 from harness_init.validation import check_doctor, validate_project
 
 app = typer.Typer(help="PBH v2.0 项目脚手架与合规性验证工具。")
+
+
+class _InitKwargs(TypedDict, total=False):
+    """Typed keyword arguments forwarded from _run_init to init_project."""
+
+    force: bool
+    no_git: bool
+    description: str
+    author: str
+    email: str
+    quick: bool
+    template: str
+    ide: str
 
 
 def _version_callback(value: bool) -> None:
@@ -41,7 +56,7 @@ def _run_init(
     ide: str = "all",
 ) -> None:
     """纯 Python 入口，供 CLI 和测试直接调用。"""
-    kwargs = {
+    kwargs: _InitKwargs = {
         "description": description,
         "author": author,
         "email": email,

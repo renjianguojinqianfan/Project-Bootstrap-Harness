@@ -2,10 +2,12 @@
 
 from pathlib import Path
 
-from harness_init.validators._base import _result
+from harness_init.validators._base import ValidationResult, _result
 
 
-def _check_required_file(results: list[dict], path: Path, label: str) -> None:
+def _check_required_file(
+    results: list[ValidationResult], path: Path, label: str
+) -> None:
     """Append a result for a required file."""
     exists = path.is_file()
     results.append(_result(
@@ -15,9 +17,9 @@ def _check_required_file(results: list[dict], path: Path, label: str) -> None:
     ))
 
 
-def validate_file_existence(project_path: Path) -> list[dict]:
+def validate_file_existence(project_path: Path) -> list[ValidationResult]:
     """Check that required PBH files exist."""
-    results: list[dict] = []
+    results: list[ValidationResult] = []
     _check_required_file(results, project_path / "AGENTS.md", "AGENTS.md")
     _check_required_file(results, project_path / "Makefile", "Makefile")
     _check_required_file(

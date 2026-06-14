@@ -8,6 +8,7 @@ from harness_init.validators._base import (
     _CRITICAL_RULES_MUST,
     _FILE_MAPPING_MUST,
     _REQUIRED_SECTIONS,
+    ValidationResult,
     _result,
 )
 
@@ -38,9 +39,9 @@ def _find_section_body(sections: dict[str, str], pattern: str) -> str:
     return ""
 
 
-def _check_heading_sections(content: str) -> list[dict]:
+def _check_heading_sections(content: str) -> list[ValidationResult]:
     """Verify AGENTS.md contains all required sections."""
-    results: list[dict] = []
+    results: list[ValidationResult] = []
     for name, pattern in _REQUIRED_SECTIONS.items():
         found = bool(re.search(pattern, content, re.IGNORECASE))
         results.append(_result(
@@ -53,9 +54,9 @@ def _check_heading_sections(content: str) -> list[dict]:
 
 def _check_required_patterns(
     body: str, patterns: list[str], label: str
-) -> list[dict]:
+) -> list[ValidationResult]:
     """Verify a list of regex patterns appear in a section body."""
-    results: list[dict] = []
+    results: list[ValidationResult] = []
     for pattern in patterns:
         found = bool(re.search(pattern, body, re.IGNORECASE))
         results.append(_result(
@@ -66,10 +67,10 @@ def _check_required_patterns(
     return results
 
 
-def _check_section_content(content: str) -> list[dict]:
+def _check_section_content(content: str) -> list[ValidationResult]:
     """Verify required content within specific sections."""
     sections = _split_into_sections(content)
-    results: list[dict] = []
+    results: list[ValidationResult] = []
     results.extend(_check_required_patterns(
         _find_section_body(sections, r"critical\s+rules"),
         _CRITICAL_RULES_MUST,
@@ -88,9 +89,9 @@ def _check_section_content(content: str) -> list[dict]:
     return results
 
 
-def _check_quick_start(content: str) -> list[dict]:
+def _check_quick_start(content: str) -> list[ValidationResult]:
     """Verify Quick Start section: first step must be 'make verify'."""
-    results: list[dict] = []
+    results: list[ValidationResult] = []
     match = re.search(
         r"#+\s*\d*\.?\s*Quick\s+Start.*?\n(.*?)(?=\n#|\Z)",
         content,
@@ -117,9 +118,9 @@ def _check_quick_start(content: str) -> list[dict]:
     return results
 
 
-def validate_agents_md(project_path: Path) -> list[dict]:
+def validate_agents_md(project_path: Path) -> list[ValidationResult]:
     """Validate AGENTS.md content compliance."""
-    results: list[dict] = []
+    results: list[ValidationResult] = []
     agents_md = project_path / "AGENTS.md"
     if not agents_md.is_file():
         results.append(_result("AGENTS.md readable", False, "File does not exist"))

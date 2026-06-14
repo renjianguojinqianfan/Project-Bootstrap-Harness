@@ -1,5 +1,15 @@
 """Shared validation helpers and constants."""
 
+from typing import TypedDict
+
+
+class ValidationResult(TypedDict):
+    """A single PBH compliance check result."""
+
+    check: str
+    passed: bool
+    message: str
+
 
 _CHECK = "check"
 _PASSED = "passed"
@@ -26,6 +36,6 @@ _COMMANDS_MUST = [r"make\s+verify", r"make\s+test", r"make\s+lint"]
 _VALID_STAGES = {"init", "plan", "execute", "evaluate", "done"}
 
 
-def _result(check: str, passed: bool, message: str) -> dict:
+def _result(check: str, passed: bool, message: str) -> ValidationResult:
     """Create a single validation result dict."""
     return {_CHECK: check, _PASSED: passed, _MESSAGE: message}

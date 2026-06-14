@@ -18,6 +18,14 @@ def _validate_project_name(project_name: str) -> None:
         )
 
 
+def _validate_project_path(path: Path) -> None:
+    """Ensure the project path does not contain parent traversal."""
+    if ".." in path.parts:
+        raise ValueError("Project path cannot contain '..'.")
+    if len(path.parts) > 1:
+        raise ValueError("Project path cannot contain path separators.")
+
+
 def _to_package_name(project_name: str) -> str:
     """将项目名转换为合法的 Python 包名。"""
     return project_name.replace("-", "_").lower()

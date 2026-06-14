@@ -3,12 +3,12 @@
 import re
 from pathlib import Path
 
-from harness_init.validators._base import _result
+from harness_init.validators._base import ValidationResult, _result
 
 
-def validate_makefile(project_path: Path) -> list[dict]:
+def validate_makefile(project_path: Path) -> list[ValidationResult]:
     """Validate Makefile contains a verify target."""
-    results: list[dict] = []
+    results: list[ValidationResult] = []
     makefile = project_path / "Makefile"
 
     if not makefile.is_file():

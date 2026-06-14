@@ -13,6 +13,7 @@ from harness_init._utils import (
     _ensure_dir,
     _to_package_name,
     _validate_project_name,
+    _validate_project_path,
 )
 
 _VALID_TEMPLATES: frozenset[str] = frozenset({"cli", "lib", "web", "notebook"})
@@ -122,10 +123,9 @@ def _create_progress_json(project_path: Path, project_name: str) -> None:
 
 def _prepare_project_path(path: Path, force: bool) -> None:
     """Validate project path and backup old directory if needed."""
+    _validate_project_path(path)
     project_name = path.name
     _validate_project_name(project_name)
-    if ".." in path.parts:
-        raise ValueError("Project path cannot contain '..'.")
     if path.exists() and not force and (path.is_file() or any(path.iterdir())):
         raise FileExistsError(
             f"Directory {path} already exists and is not empty. Use --force to overwrite."

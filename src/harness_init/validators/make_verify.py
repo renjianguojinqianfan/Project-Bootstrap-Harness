@@ -3,12 +3,12 @@
 import subprocess
 from pathlib import Path
 
-from harness_init.validators._base import _result
+from harness_init.validators._base import ValidationResult, _result
 
 
-def validate_make_verify(project_path: Path) -> list[dict]:
+def validate_make_verify(project_path: Path) -> list[ValidationResult]:
     """Run 'make verify' and check the exit code."""
-    results: list[dict] = []
+    results: list[ValidationResult] = []
     if not (project_path / "Makefile").is_file():
         results.append(_result("make verify passes", False, "No Makefile found"))
         return results

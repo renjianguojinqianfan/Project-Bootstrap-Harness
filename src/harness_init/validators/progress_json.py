@@ -5,7 +5,7 @@ import re
 from pathlib import Path
 from typing import Any
 
-from harness_init.validators._base import _VALID_STAGES, _result
+from harness_init.validators._base import _VALID_STAGES, ValidationResult, _result
 
 
 def _parse_progress_json(path: Path) -> tuple[bool, Any]:
@@ -20,7 +20,7 @@ def _parse_progress_json(path: Path) -> tuple[bool, Any]:
     return True, data
 
 
-def _check_project_name(data: dict) -> dict:
+def _check_project_name(data: dict) -> ValidationResult:
     """Validate progress.json project_name field."""
     if "project_name" not in data:
         return _result("progress.json project_name", False, "Missing 'project_name'")
@@ -29,7 +29,7 @@ def _check_project_name(data: dict) -> dict:
     return _result("progress.json project_name", ok, f"project_name = {value!r}")
 
 
-def _check_current_stage(data: dict) -> dict:
+def _check_current_stage(data: dict) -> ValidationResult:
     """Validate progress.json current_stage field."""
     if "current_stage" not in data:
         return _result("progress.json current_stage", False, "Missing 'current_stage'")
@@ -41,7 +41,7 @@ def _check_current_stage(data: dict) -> dict:
     return _result("progress.json current_stage", ok, msg)
 
 
-def _check_plans(data: dict) -> dict:
+def _check_plans(data: dict) -> ValidationResult:
     """Validate progress.json plans field."""
     if "plans" not in data:
         return _result("progress.json plans", False, "Missing 'plans'")
@@ -54,7 +54,7 @@ def _check_plans(data: dict) -> dict:
     )
 
 
-def _check_last_updated(data: dict) -> dict:
+def _check_last_updated(data: dict) -> ValidationResult:
     """Validate progress.json last_updated field."""
     if "last_updated" not in data:
         return _result("progress.json last_updated", False, "Missing 'last_updated'")
@@ -68,9 +68,9 @@ def _check_last_updated(data: dict) -> dict:
     return _result("progress.json last_updated", iso_ok, msg)
 
 
-def validate_progress_json(project_path: Path) -> list[dict]:
+def validate_progress_json(project_path: Path) -> list[ValidationResult]:
     """Validate .harness/progress.json schema compliance."""
-    results: list[dict] = []
+    results: list[ValidationResult] = []
     pj = project_path / ".harness" / "progress.json"
 
     if not pj.is_file():

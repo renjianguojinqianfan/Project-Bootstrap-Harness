@@ -24,7 +24,7 @@ runner = CliRunner()
 def _create_compliant_project(tmp_path: Path, name: str = "test-project") -> Path:
     """Helper: create a fully compliant project via init_project."""
     project_path = tmp_path / name
-    init_project(str(project_path), no_git=True)
+    init_project(name, no_git=True)
     return project_path
 
 

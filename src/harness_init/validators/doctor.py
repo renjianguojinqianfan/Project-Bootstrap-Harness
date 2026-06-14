@@ -3,10 +3,10 @@
 import shutil
 import sys
 
-from harness_init.validators._base import _result
+from harness_init.validators._base import ValidationResult, _result
 
 
-def _check_tool(name: str, cmd: str | None = None) -> dict:
+def _check_tool(name: str, cmd: str | None = None) -> ValidationResult:
     """Check whether a CLI tool is available on PATH."""
     cmd = cmd or name
     path = shutil.which(cmd)
@@ -15,7 +15,7 @@ def _check_tool(name: str, cmd: str | None = None) -> dict:
     return _result(f"{name} available", False, f"'{cmd}' not found on PATH")
 
 
-def _check_python_version() -> dict:
+def _check_python_version() -> ValidationResult:
     """Check Python version >= 3.11."""
     v = sys.version_info
     ok = (v.major, v.minor) >= (3, 11)
@@ -27,9 +27,9 @@ def _check_python_version() -> dict:
     )
 
 
-def check_doctor() -> tuple[bool, list[dict]]:
+def check_doctor() -> tuple[bool, list[ValidationResult]]:
     """Check that the local environment satisfies PBH prerequisites."""
-    results: list[dict] = [
+    results: list[ValidationResult] = [
         _check_tool("make"),
         _check_tool("git"),
         _check_tool("python"),

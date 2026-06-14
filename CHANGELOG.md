@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.1] - 2026-06-14
+
+### Fixed
+
+- **P0** 修复 `core.py` 与 `validation.py` 超长模块/函数问题：拆分为 `validators/` 包、`_ide.py`、`_quick.py`，确保所有模块 ≤200 行、函数 ≤30 行，符合 AGENTS.md 约束。
+- **P1** 修复验证器返回值类型与跨平台路径校验：统一返回 `ValidationResult` TypedDict；禁止项目名包含 `..`、路径分隔符或绝对路径；测试改用相对路径 `tmp_path` chdir 夹具。
+- **P2** 修复魔法值与 `_run_init` 参数类型：将项目名/PEP-508 正则与 git 错误信息模板提取为模块常量；为 `_run_init` 增加 `_InitKwargs` TypedDict。
+
+### Changed
+
+- 更新 `README.md` / `README.en.md` 生态表格中 Harness-Lint 规则数量，从 9 条改为 10 条。
+
 ## [2.0.0] - 2026-05-23
 
 ### Added

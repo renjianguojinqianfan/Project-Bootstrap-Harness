@@ -68,7 +68,7 @@ Enter the project and verify:
 ```bash
 cd my-awesome-project
 pip install -e ".[dev]"
-make verify        # Should output ✅ Verification passed
+make verify        # Should output [OK] verified
 ```
 
 ### 💡 If make is not available

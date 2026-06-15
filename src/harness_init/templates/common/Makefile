@@ -1,7 +1,7 @@
 .PHONY: verify test lint install
 
 verify: lint test
-	@echo "验证通过"
+	@echo "[OK] verified"
 
 test:
 	pytest tests/ -v --cov=src --cov-fail-under=85

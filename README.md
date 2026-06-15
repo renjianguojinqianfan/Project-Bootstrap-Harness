@@ -69,7 +69,7 @@ harness-init my-project --quick --yes
 ```bash
 cd my-awesome-project
 pip install -e ".[dev]"
-make verify        # 应输出 ✅ 验证通过
+make verify        # 应输出 [OK] verified
 ```
 
 ### 💡 如果 make 命令不可用

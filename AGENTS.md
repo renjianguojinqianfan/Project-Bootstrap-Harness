@@ -5,9 +5,10 @@
 
 ## 1. Project Snapshot
 
-**harness-init** is a CLI tool to scaffold harness-ready Python projects. It generates non-empty projects that pass `make verify` immediately.
+**harness-init** is a dual-purpose CLI: it scaffolds harness-ready Python projects (`init`) **and** validates existing projects against the PBH-SPEC protocol (`validate`, `doctor`). Generated projects pass `make verify` immediately.
 
-**Maintainer**: harness-init team  
+**Commands**: `init` (scaffold) · `validate` (compliance check) · `doctor` (diagnose & report)
+**Maintainer**: harness-init team (PyPI: `renjianguojinqianfan`)
 **Type**: cli
 
 ## 2. Change Control Matrix (Feedforward)
@@ -52,12 +53,17 @@
 
 | Type | Location | Description |
 |------|----------|-------------|
-| CLI | `src/harness_init/cli.py` | Argument parsing only |
-| Core | `src/harness_init/core.py` | Project generation logic |
-| Utils | `src/harness_init/_utils.py` | Name validation, template rendering |
+| CLI | `src/harness_init/cli.py` | Argument parsing for `init` / `validate` / `doctor` |
+| Init core | `src/harness_init/core.py` | Project scaffolding logic |
+| Validation facade | `src/harness_init/validation.py` | Thin re-export layer over `validators/` |
+| Validators package | `src/harness_init/validators/` | PBH-SPEC compliance checks (agents_md, makefile, make_verify, progress_json, project, doctor, file_existence, _base) |
+| Quick mode | `src/harness_init/_quick.py` | `--quick` minimal scaffold path |
+| IDE configs | `src/harness_init/_ide.py` | IDE adapter generation (cursor / copilot / etc.) |
+| Template engine | `src/harness_init/_templates.py` | Template rendering helpers |
+| Utils | `src/harness_init/_utils.py` | Name validation, path helpers |
 | Git helpers | `src/harness_init/_git.py` | Git init and rollback helpers |
-| Templates | `src/harness_init/templates/` | Target project templates |
-| Plan templates | `src/harness_init/templates/.harness/templates/` | Agent plan templates for generated projects |
-| Tests | `tests/` | Unit tests (mirror `src/` structure) |
+| Templates | `src/harness_init/templates/{cli,lib,web,notebook,common}/` | Per-type project templates (each may embed `.harness/templates/`) |
+| Tests | `tests/` | Unit tests; `validators/` package is consolidated under `test_validation.py` |
 | Plans | `docs/plans/` | Design docs and task plans |
+| Spec | `docs/spec/PBH-SPEC.md` | PBH protocol standard (drives `validate`/`doctor`) |
 | Entry | `README.md` / `README.en.md` | Human-facing documentation |

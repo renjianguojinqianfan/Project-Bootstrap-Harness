@@ -31,7 +31,7 @@
    - Touched `src/` structure → update `AGENTS.md` §6 File Mapping
    - Touched CLI commands/flags → update `AGENTS.md` §1 + `README.md` + `README.en.md`
    - Touched `templates/` → keep top-level `Makefile` and template `Makefile` aligned
-   - Releasing → bump BOTH `pyproject.toml` and `__init__.py`, add `CHANGELOG.md` entry, push annotated tag
+   - Releasing → see `docs/RELEASE.md` for full checklist (version sync matrix, post-publish verification)
 
 ## 4. Agent Rules (DO / DON'T)
 
@@ -70,4 +70,6 @@
 | Tests | `tests/` | Unit tests; `validators/` package is consolidated under `test_validation.py` |
 | Plans | `docs/plans/` | Design docs and task plans |
 | Spec | `docs/spec/PBH-SPEC.md` | PBH protocol standard (drives `validate`/`doctor`) |
+| Release | `docs/RELEASE.md` | Release checklist (SemVer, version sync matrix, post-publish verification) |
+| PR template | `.github/pull_request_template.md` | Default PR body with self-check + release-specific checklist |
 | Entry | `README.md` / `README.en.md` | Human-facing documentation |

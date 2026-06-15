@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.2] - 2026-06-15
+
+### Fixed
+
+- **Makefile** `make verify` 输出由 `✅ 验证通过` 改为 ASCII `[OK] verified`，修复 Windows PowerShell 默认控制台下中文 emoji 的乱码问题；同步更新 `templates/common/Makefile`，确保 `harness-init` 生成的项目跨平台输出一致。
+
+### Changed
+
+- **AGENTS.md**：`§1 Project Snapshot` 与 `§6 File Mapping` 同步至 v2.0+ 实际代码结构（覆盖 `validation.py`、`validators/` 包、`_quick.py`、`_ide.py`、`_templates.py`、多类型模板路径与 `docs/spec/PBH-SPEC.md` 入口）。
+- **README.md** / **README.en.md**：更新 `make verify` 预期输出示例以匹配新的 ASCII 字符串。
+
 ## [2.0.1] - 2026-06-14
 
 ### Fixed

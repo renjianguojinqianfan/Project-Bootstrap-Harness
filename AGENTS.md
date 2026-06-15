@@ -27,7 +27,11 @@
 2. **Verify Baseline**: Run `make verify` → must pass before any edit
 3. **Select Task**: Pick ONE item from open issues / plans → mark in progress
 4. **Implement**: Generate code → auto-trigger `make verify`
-5. **Commit**: Write descriptive commit → update relevant docs
+5. **Commit & Sync** (Conventional Commits; trigger only what applies):
+   - Touched `src/` structure → update `AGENTS.md` §6 File Mapping
+   - Touched CLI commands/flags → update `AGENTS.md` §1 + `README.md` + `README.en.md`
+   - Touched `templates/` → keep top-level `Makefile` and template `Makefile` aligned
+   - Releasing → bump BOTH `pyproject.toml` and `__init__.py`, add `CHANGELOG.md` entry, push annotated tag
 
 ## 4. Agent Rules (DO / DON'T)
 

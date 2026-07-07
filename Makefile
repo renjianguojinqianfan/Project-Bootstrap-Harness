@@ -1,6 +1,6 @@
-.PHONY: verify test lint install
+.PHONY: verify test lint format-check install
 
-verify: lint test
+verify: lint format-check test
 	@echo "[OK] verified"
 
 test:
@@ -8,6 +8,9 @@ test:
 
 lint:
 	ruff check src/ tests/
+
+format-check:
+	ruff format --check src/ tests/
 
 install:
 	pip install -e ".[dev]"

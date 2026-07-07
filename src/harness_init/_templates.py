@@ -40,9 +40,7 @@ def _gather_quick_bases(templates_dir: Path) -> set[str]:
     return quick_bases
 
 
-def _resolve_quick_variant(
-    src: Path, rel: Path, quick: bool, quick_bases: set[str]
-) -> Path | None:
+def _resolve_quick_variant(src: Path, rel: Path, quick: bool, quick_bases: set[str]) -> Path | None:
     """处理 .quick. 模板变体，返回目标相对路径或 None（跳过）。"""
     if ".quick." in src.name:
         if not quick:
@@ -118,10 +116,24 @@ def copy_templates(
     """复制模板文件到项目目录（递归）。先复制 common，再复制 type-specific。"""
     if common_dir is not None:
         _copy_template_source(
-            common_dir, project_path, project_name, package_name,
-            quick, is_excluded, description, author, email,
+            common_dir,
+            project_path,
+            project_name,
+            package_name,
+            quick,
+            is_excluded,
+            description,
+            author,
+            email,
         )
     _copy_template_source(
-        templates_dir, project_path, project_name, package_name,
-        quick, is_excluded, description, author, email,
+        templates_dir,
+        project_path,
+        project_name,
+        package_name,
+        quick,
+        is_excluded,
+        description,
+        author,
+        email,
     )

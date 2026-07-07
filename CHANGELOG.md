@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.3] - 2026-07-07
+
+### Added
+
+- **Makefile**：`verify` 依赖链新增 `format-check` 目标（`ruff format --check src/ tests/`），在 lint 与 test 之间强制代码格式门禁；同步 `templates/common/Makefile`，使 `harness-init` 生成的项目开箱即具备格式检查能力。
+
+### Fixed
+
+- **progress.json**：`core.py` 生成 `.harness/progress.json` 时补齐 `project_type` 与 `harness_version` 字段。`project_type` 不再硬编码为 `cli`，改为写入用户传入的 `--template` 实际值（cli/lib/web/notebook）；`harness_version` 通过 `importlib.metadata.version("harness-init")` 动态获取，符合 PBH-SPEC 兼容性机制要求。
+
 ## [2.0.2] - 2026-06-15
 
 ### Fixed

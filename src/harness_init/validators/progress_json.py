@@ -59,9 +59,7 @@ def _check_last_updated(data: dict) -> ValidationResult:
     if "last_updated" not in data:
         return _result("progress.json last_updated", False, "Missing 'last_updated'")
     value = data["last_updated"]
-    iso_ok = isinstance(value, str) and bool(
-        re.match(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}", value)
-    )
+    iso_ok = isinstance(value, str) and bool(re.match(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}", value))
     msg = f"last_updated = {value!r}"
     if not iso_ok:
         msg += " (not ISO 8601 format)"
@@ -83,10 +81,12 @@ def validate_progress_json(project_path: Path) -> list[ValidationResult]:
         return results
 
     results.append(_result("progress.json valid JSON", True, "Parsed successfully"))
-    results.extend([
-        _check_project_name(payload),
-        _check_current_stage(payload),
-        _check_plans(payload),
-        _check_last_updated(payload),
-    ])
+    results.extend(
+        [
+            _check_project_name(payload),
+            _check_current_stage(payload),
+            _check_plans(payload),
+            _check_last_updated(payload),
+        ]
+    )
     return results

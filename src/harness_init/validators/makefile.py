@@ -12,9 +12,7 @@ def validate_makefile(project_path: Path) -> list[ValidationResult]:
     makefile = project_path / "Makefile"
 
     if not makefile.is_file():
-        results.append(_result(
-            "Makefile verify target", False, "Makefile does not exist"
-        ))
+        results.append(_result("Makefile verify target", False, "Makefile does not exist"))
         return results
 
     try:
@@ -24,9 +22,11 @@ def validate_makefile(project_path: Path) -> list[ValidationResult]:
         return results
 
     has_verify = bool(re.search(r"^verify\s*:", content, re.MULTILINE))
-    results.append(_result(
-        "Makefile verify target",
-        has_verify,
-        "Target 'verify:' found" if has_verify else "Target 'verify:' NOT found",
-    ))
+    results.append(
+        _result(
+            "Makefile verify target",
+            has_verify,
+            "Target 'verify:' found" if has_verify else "Target 'verify:' NOT found",
+        )
+    )
     return results

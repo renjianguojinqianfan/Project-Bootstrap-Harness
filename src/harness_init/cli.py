@@ -89,12 +89,8 @@ def init(
     no_git: bool = typer.Option(False, "--no-git", help="跳过 Git 初始化。"),
     yes: bool = typer.Option(False, "--yes", "-y", help="跳过交互提示，使用默认值。"),
     quick: bool = typer.Option(False, "--quick", "-q", help="生成精简项目。"),
-    template: str = typer.Option(
-        "cli", "--template", "-t", help="项目模板类型（cli/lib/web/notebook）。"
-    ),
-    ide: str = typer.Option(
-        "all", "--ide", help="IDE 配置模式（all/none/cursor/claude/trae/copilot/opencode）。"
-    ),
+    template: str = typer.Option("cli", "--template", "-t", help="项目模板类型（cli/lib/web/notebook）。"),
+    ide: str = typer.Option("all", "--ide", help="IDE 配置模式（all/none/cursor/claude/trae/copilot/opencode）。"),
 ) -> None:
     """初始化一个新的 Harness Engineering 项目。"""
     description, author, email = _prompt_metadata(yes)
@@ -168,12 +164,8 @@ def main(
     ),
     yes: bool = typer.Option(False, "--yes", "-y", help="跳过交互提示，使用默认值。"),
     quick: bool = typer.Option(False, "--quick", "-q", help="生成精简项目。"),
-    template: str = typer.Option(
-        "cli", "--template", "-t", help="项目模板类型（cli/lib/web/notebook）。"
-    ),
-    ide: str = typer.Option(
-        "all", "--ide", help="IDE 配置模式（all/none/cursor/claude/trae/copilot/opencode）。"
-    ),
+    template: str = typer.Option("cli", "--template", "-t", help="项目模板类型（cli/lib/web/notebook）。"),
+    ide: str = typer.Option("all", "--ide", help="IDE 配置模式（all/none/cursor/claude/trae/copilot/opencode）。"),
 ) -> None:
     """初始化一个新的 Harness Engineering 项目。"""
     description, author, email = _prompt_metadata(yes)

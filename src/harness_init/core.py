@@ -3,6 +3,7 @@
 import json
 import shutil
 from datetime import UTC, datetime
+from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 
 from harness_init._git import _init_git, _on_remove_error
@@ -22,10 +23,7 @@ _VALID_TEMPLATES: frozenset[str] = frozenset({"cli", "lib", "web", "notebook"})
 def _validate_template(template: str) -> None:
     """Validate template type."""
     if template not in _VALID_TEMPLATES:
-        raise ValueError(
-            f"Unknown template '{template}'. "
-            f"Valid templates: {', '.join(sorted(_VALID_TEMPLATES))}"
-        )
+        raise ValueError(f"Unknown template '{template}'. Valid templates: {', '.join(sorted(_VALID_TEMPLATES))}")
 
 
 def _get_templates_dir(template: str = "cli") -> Path:
@@ -38,9 +36,7 @@ def _get_common_templates_dir() -> Path:
     return Path(__file__).parent / "templates" / "common"
 
 
-def _create_directories(
-    project_path: Path, project_name: str, quick: bool = False, template: str = "cli"
-) -> None:
+def _create_directories(project_path: Path, project_name: str, quick: bool = False, template: str = "cli") -> None:
     """Create standard project directory structure."""
     package_name = _to_package_name(project_name)
     dirs = [
@@ -92,9 +88,7 @@ def _copy_templates(
     )
 
 
-def _create_source_files(
-    project_path: Path, project_name: str, quick: bool = False, template: str = "cli"
-) -> None:
+def _create_source_files(project_path: Path, project_name: str, quick: bool = False, template: str = "cli") -> None:
     """Create initial Python source and test files."""
     package_name = _to_package_name(project_name)
     (project_path / "tests" / "__init__.py").write_text("", encoding="utf-8")
@@ -107,10 +101,16 @@ def _create_source_files(
     )
 
 
-def _create_progress_json(project_path: Path, project_name: str) -> None:
+def _create_progress_json(project_path: Path, project_name: str, template: str = "cli") -> None:
     """Create initial .harness/progress.json with proper schema."""
+    try:
+        harness_version = version("harness-init")
+    except PackageNotFoundError:
+        harness_version = "unknown"
     progress_data = {
         "project_name": project_name,
+        "project_type": template,
+        "harness_version": harness_version,
         "current_stage": "init",
         "plans": [],
         "last_updated": datetime.now(UTC).isoformat(),
@@ -127,9 +127,7 @@ def _prepare_project_path(path: Path, force: bool) -> None:
     project_name = path.name
     _validate_project_name(project_name)
     if path.exists() and not force and (path.is_file() or any(path.iterdir())):
-        raise FileExistsError(
-            f"Directory {path} already exists and is not empty. Use --force to overwrite."
-        )
+        raise FileExistsError(f"Directory {path} already exists and is not empty. Use --force to overwrite.")
     if force and path.exists():
         suffix = datetime.now(UTC).strftime(".bak-%Y%m%d%H%M%S%f")
         backup_path = path.with_name(path.name + suffix)
@@ -149,11 +147,17 @@ def _setup_project(
     """Create directories, copy templates and generate initial source."""
     _create_directories(path, project_name, quick=quick, template=template)
     _copy_templates(
-        path, project_name, description, author, email,
-        quick=quick, template=template, ide=ide,
+        path,
+        project_name,
+        description,
+        author,
+        email,
+        quick=quick,
+        template=template,
+        ide=ide,
     )
     _create_source_files(path, project_name, quick=quick, template=template)
-    _create_progress_json(path, path.name)
+    _create_progress_json(path, path.name, template=template)
 
 
 def _init_git_safe(path: Path, author: str, email: str) -> None:
@@ -184,8 +188,14 @@ def init_project(
     _validate_template(template)
     _prepare_project_path(path, force)
     _setup_project(
-        path, path.name, description, author, email,
-        quick=quick, template=template, ide=ide,
+        path,
+        path.name,
+        description,
+        author,
+        email,
+        quick=quick,
+        template=template,
+        ide=ide,
     )
     if not no_git:
         _init_git_safe(path, author, email)

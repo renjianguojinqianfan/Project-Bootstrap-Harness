@@ -44,26 +44,28 @@ def _check_heading_sections(content: str) -> list[ValidationResult]:
     results: list[ValidationResult] = []
     for name, pattern in _REQUIRED_SECTIONS.items():
         found = bool(re.search(pattern, content, re.IGNORECASE))
-        results.append(_result(
-            f"AGENTS.md §{name}",
-            found,
-            f"Section matching /{pattern}/ {'found' if found else 'NOT found'}",
-        ))
+        results.append(
+            _result(
+                f"AGENTS.md §{name}",
+                found,
+                f"Section matching /{pattern}/ {'found' if found else 'NOT found'}",
+            )
+        )
     return results
 
 
-def _check_required_patterns(
-    body: str, patterns: list[str], label: str
-) -> list[ValidationResult]:
+def _check_required_patterns(body: str, patterns: list[str], label: str) -> list[ValidationResult]:
     """Verify a list of regex patterns appear in a section body."""
     results: list[ValidationResult] = []
     for pattern in patterns:
         found = bool(re.search(pattern, body, re.IGNORECASE))
-        results.append(_result(
-            f"{label}: {pattern}",
-            found,
-            f"Pattern /{pattern}/ {'found' if found else 'NOT found'}",
-        ))
+        results.append(
+            _result(
+                f"{label}: {pattern}",
+                found,
+                f"Pattern /{pattern}/ {'found' if found else 'NOT found'}",
+            )
+        )
     return results
 
 
@@ -71,21 +73,27 @@ def _check_section_content(content: str) -> list[ValidationResult]:
     """Verify required content within specific sections."""
     sections = _split_into_sections(content)
     results: list[ValidationResult] = []
-    results.extend(_check_required_patterns(
-        _find_section_body(sections, r"critical\s+rules"),
-        _CRITICAL_RULES_MUST,
-        "Critical Rules content",
-    ))
-    results.extend(_check_required_patterns(
-        _find_section_body(sections, r"file\s+mapping"),
-        _FILE_MAPPING_MUST,
-        "File Mapping entry",
-    ))
-    results.extend(_check_required_patterns(
-        _find_section_body(sections, r"commands"),
-        _COMMANDS_MUST,
-        "Commands entry",
-    ))
+    results.extend(
+        _check_required_patterns(
+            _find_section_body(sections, r"critical\s+rules"),
+            _CRITICAL_RULES_MUST,
+            "Critical Rules content",
+        )
+    )
+    results.extend(
+        _check_required_patterns(
+            _find_section_body(sections, r"file\s+mapping"),
+            _FILE_MAPPING_MUST,
+            "File Mapping entry",
+        )
+    )
+    results.extend(
+        _check_required_patterns(
+            _find_section_body(sections, r"commands"),
+            _COMMANDS_MUST,
+            "Commands entry",
+        )
+    )
     return results
 
 
@@ -102,19 +110,23 @@ def _check_quick_start(content: str) -> list[ValidationResult]:
     body = match.group(1)
     step_match = re.search(r"^\s*\d+\.\s*(.+)$", body, re.MULTILINE)
     if not step_match:
-        results.append(_result(
-            "Quick Start first step is make verify",
-            False,
-            "No numbered steps found in Quick Start",
-        ))
+        results.append(
+            _result(
+                "Quick Start first step is make verify",
+                False,
+                "No numbered steps found in Quick Start",
+            )
+        )
         return results
     first_step = step_match.group(1)
     ok = bool(re.search(r"make\s+verify", first_step, re.IGNORECASE))
-    results.append(_result(
-        "Quick Start first step is make verify",
-        ok,
-        f"First step: '{first_step.strip()}'",
-    ))
+    results.append(
+        _result(
+            "Quick Start first step is make verify",
+            ok,
+            f"First step: '{first_step.strip()}'",
+        )
+    )
     return results
 
 
@@ -132,9 +144,7 @@ def validate_agents_md(project_path: Path) -> list[ValidationResult]:
         results.append(_result("AGENTS.md readable", False, f"Read error: {exc}"))
         return results
 
-    results.append(_result(
-        "AGENTS.md readable", True, f"Read OK ({len(content)} bytes)"
-    ))
+    results.append(_result("AGENTS.md readable", True, f"Read OK ({len(content)} bytes)"))
     results.extend(_check_heading_sections(content))
     results.extend(_check_section_content(content))
     results.extend(_check_quick_start(content))

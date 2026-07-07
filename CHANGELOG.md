@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.4] - 2026-07-07
+
+### Added
+
+- **Makefile**：新增 `make format` 目标（`ruff format src/ tests/`），提供确定性的代码格式化命令；与 `make format-check`（检查）形成"应用/检查"对称。同步 `templates/common/Makefile`。
+
+### Fixed
+
+- **`make fix` 空引用**：8 个模板文件（4 个 AGENTS.md、`cli/CLAUDE.md`、`cli/.cursorrules`、`common/README.md`、`common/README.en.md`）引用了不存在的 `make fix` 目标。改为 `make format`（仅 `ruff format`，确定性格式化）；lint 类涉及代码含义的修复不设命令，仍由 Agent 决断（受 AGENTS.md "Auto-fix circuit breaker" 约束）。
+
+### Changed
+
+- **文档同步 `format-check`**：4 个模板 AGENTS.md §9 Commands、`cli/CLAUDE.md`、`cli/.cursorrules`、仓库 `README`/`CONTRIBUTING`/PR 模板的 `make verify` 描述由 "lint + tests + coverage" 更新为 "lint + format-check + tests + coverage"。
+
+### Docs
+
+- **PBH-SPEC §2.3**：将 `project_type`（MAY）与 `harness_version`（SHOULD）补入 `.harness/progress.json` schema，匹配 v2.0.3 起的实际写入行为；配套 PRD 见 `docs/plans/2026-07-07-progress-json-fields-spec-sync.md`。
+
 ## [2.0.3] - 2026-07-07
 
 ### Added

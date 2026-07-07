@@ -25,8 +25,8 @@
 ## Common Commands
 
 ```bash
-make verify    # lint (ruff) + tests (pytest), coverage >= 85%
-make fix       # auto-fix linting; MUST re-run `make verify` after
+make verify    # lint + format-check (ruff) + tests (pytest), coverage >= 85%
+make format    # apply formatting (ruff format); re-run `make verify` after
 ```
 
 ## Quick Rules

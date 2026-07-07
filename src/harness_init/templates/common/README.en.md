@@ -13,10 +13,11 @@ make verify
 
 | Command | Description |
 |---------|-------------|
-| `make verify` | lint + tests + coverage |
+| `make verify` | lint + format check + tests + coverage |
 | `make test` | run tests |
 | `make lint` | code style check |
-| `make fix` | auto-fix style issues |
+| `make format-check` | check formatting without modifying files |
+| `make format` | apply code formatting |
 
 ## Project Structure
 

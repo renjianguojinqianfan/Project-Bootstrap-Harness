@@ -78,7 +78,9 @@ PBH 的目标是在项目初始化时**系统性地解决**上述问题。它通
   "project_name": "string",
   "current_stage": "enum['init','plan','execute','evaluate','done']",
   "plans": ["string"],
-  "last_updated": "ISO 8601 datetime string"
+  "last_updated": "ISO 8601 datetime string",
+  "project_type": "string (可选)",
+  "harness_version": "string (可选)"
 }
 ```
 
@@ -88,6 +90,8 @@ PBH 的目标是在项目初始化时**系统性地解决**上述问题。它通
 | `current_stage` | 项目当前阶段，**必须**是枚举值之一。详见下方生命周期定义。 |
 | `plans` | 项目采用的外部规范或计划文件列表（如 `tasks/task_plan.md`），为 Agent 提供额外的上下文来源。 |
 | `last_updated` | 最后更新的 ISO 8601 日期时间字符串。**必须**精确到秒。 |
+| `project_type` | 项目类型（**可选**）。存在时**应当**取 `cli`/`lib`/`web`/`notebook` 之一，并与 `AGENTS.md` §1 声明的类型一致。记录播种项目时使用的 `--template`。 |
+| `harness_version` | 播种工具版本（**应当**）。兼容性说明详见 §4.2。 |
 
 **生命周期定义**：
 | 阶段 | 含义 | Agent 行为预期 |

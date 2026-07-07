@@ -19,7 +19,7 @@
 
 ## 自检清单
 
-- [ ] `make verify` 通过（lint + 测试 + 覆盖率 ≥ 85%）
+- [ ] `make verify` 通过（lint + 格式检查 + 测试 + 覆盖率 ≥ 85%）
 - [ ] 改了 `src/` 结构 → `AGENTS.md` §6 File Mapping 已同步
 - [ ] 改了 CLI 命令/参数 → `README.md` + `README.en.md` + `AGENTS.md` §1 已同步
 - [ ] 改了 `templates/` → 顶层 `Makefile` 与模板 `Makefile` 已对齐

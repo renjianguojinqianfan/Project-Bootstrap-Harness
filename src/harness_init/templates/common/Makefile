@@ -1,4 +1,4 @@
-.PHONY: verify test lint format-check
+.PHONY: verify test lint format-check format
 
 verify: lint format-check test
 	@echo "[OK] verified"
@@ -11,3 +11,6 @@ lint:
 
 format-check:
 	ruff format --check src/ tests/
+
+format:
+	ruff format src/ tests/

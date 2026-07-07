@@ -16,7 +16,7 @@ pytest tests/  # Ensure all existing tests pass
 1. Fork this repository and create a feature branch
 2. Declare your task plan in `tasks/` before modifying code
 3. Follow the working guidelines in AGENTS.md: state your plan before coding
-4. Ensure `make verify` passes (lint + test + coverage ≥ 85%)
+4. Ensure `make verify` passes (lint + format-check + test + coverage ≥ 85%)
 5. Submit a PR, referencing relevant AGENTS.md clauses in the description
 
 ## What Contributions Are Welcome

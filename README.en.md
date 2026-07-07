@@ -30,7 +30,7 @@ PBH plants that protocol, quality gates, and state tracking into your project th
 ### ✅ PBH Is
 
 - **A universal collaboration protocol**: `AGENTS.md` serves as the common entry point for all AI tools, defining critical rules, working guidelines, and project structure
-- **Quality gate infrastructure**: `make verify` works out of the box — lint, tests, and coverage in one command
+- **Quality gate infrastructure**: `make verify` works out of the box — lint, format check, tests, and coverage in one command
 - **An observable Agent behavior benchmark**: The same `AGENTS.md` lets you observe how different AI tools follow rules and perform
 - **A Spec Coding container**: Provides the `tasks/` directory for you to break down work; content is entirely up to you
 - **A "protocol seeder"**: Seeds rules on project creation so constraints travel with the project, not the developer.

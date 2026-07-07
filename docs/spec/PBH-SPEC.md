@@ -77,7 +77,9 @@ This specification clearly distinguishes between "mandatory (MUST)" and "optiona
   "project_name": "string",
   "current_stage": "enum['init','plan','execute','evaluate','done']",
   "plans": ["string"],
-  "last_updated": "ISO 8601 datetime string"
+  "last_updated": "ISO 8601 datetime string",
+  "project_type": "string (optional)",
+  "harness_version": "string (optional)"
 }
 ```
 
@@ -87,6 +89,8 @@ This specification clearly distinguishes between "mandatory (MUST)" and "optiona
 | `current_stage` | Current project phase. **MUST** be one of the enumerated values. See lifecycle definition below. |
 | `plans` | List of external specification or plan files adopted by the project (e.g., `tasks/task_plan.md`), providing additional context sources for the Agent. |
 | `last_updated` | ISO 8601 datetime string of the last update. **MUST** be precise to the second. |
+| `project_type` | Project type (**MAY**). When present, **SHOULD** be one of `cli`/`lib`/`web`/`notebook` and match the type declared in `AGENTS.md` §1. Records the `--template` used to seed the project. |
+| `harness_version` | Version of the seeding tool (**SHOULD**). See §4.2 for the compatibility rationale. |
 
 **Lifecycle Definition**:
 | Stage | Meaning | Expected Agent Behavior |

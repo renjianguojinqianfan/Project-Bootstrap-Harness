@@ -16,7 +16,7 @@ pytest tests/  # 确保现有测试通过
 1. Fork 本仓库，创建功能分支
 2. 修改代码前，先在 `tasks/` 下声明任务计划
 3. 遵循 AGENTS.md 中的行为准则：先说明计划，再执行
-4. 确保 `make verify` 通过（lint + test + coverage ≥ 85%）
+4. 确保 `make verify` 通过（lint + format-check + test + coverage ≥ 85%）
 5. 提交 PR，PR 描述中引用 AGENTS.md 相关条款（若有）
 
 ## 什么类型的贡献受欢迎

@@ -13,10 +13,11 @@ make verify
 
 | 命令 | 说明 |
 |------|------|
-| `make verify` | lint + 测试 + 覆盖率 |
+| `make verify` | lint + 格式检查 + 测试 + 覆盖率 |
 | `make test` | 运行测试 |
 | `make lint` | 代码风格检查 |
-| `make fix` | 自动修复风格问题 |
+| `make format-check` | 检查代码格式（不修改文件） |
+| `make format` | 应用代码格式化 |
 
 ## 项目结构
 

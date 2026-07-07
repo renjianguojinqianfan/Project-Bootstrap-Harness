@@ -22,5 +22,5 @@
 
 ## Commands
 
-- `make verify` — lint + tests, coverage ≥ 85%
-- `make fix` — auto-fix linting
+- `make verify` — lint + format-check + tests, coverage ≥ 85%
+- `make format` — apply code formatting

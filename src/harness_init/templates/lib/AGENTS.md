@@ -56,7 +56,8 @@
 
 | Command | What it does |
 |---------|--------------|
-| `make verify` | Full quality check (lint + tests + coverage). Must pass before commit |
+| `make verify` | Full quality check (lint + format-check + tests + coverage). Must pass before commit |
 | `make test` | Run tests only |
 | `make lint` | Run code style checks only |
-| `make fix` | Auto-fix style issues where possible |
+| `make format-check` | Check code formatting without modifying files |
+| `make format` | Apply code formatting (ruff format) |

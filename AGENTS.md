@@ -73,3 +73,18 @@
 | Release | `docs/RELEASE.md` | Release checklist (SemVer, version sync matrix, post-publish verification) |
 | PR template | `.github/pull_request_template.md` | Default PR body with self-check + release-specific checklist |
 | Entry | `README.md` / `README.en.md` | Human-facing documentation |
+| Agent skills config | `docs/agents/` | Issue tracker / triage labels / domain docs configuration |
+
+## 7. Agent skills
+
+### Issue tracker
+
+Issues live in GitHub Issues (`gh` CLI). See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Five default canonical labels (needs-triage / needs-info / ready-for-agent / ready-for-human / wontfix). See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: root `CONTEXT.md` + `docs/adr/` (both lazily created). See `docs/agents/domain.md`.

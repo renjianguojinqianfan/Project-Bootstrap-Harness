@@ -49,6 +49,10 @@ htmlcov/
 .config/
 .sisyphus/
 
+# Local agent tool state (personal, do not commit)
+.workbuddy/
+.mcp_test_input.jsonl
+
 # OpenCode local configuration (personal toolchain, do not commit)
 opencode.json
 .opencode/

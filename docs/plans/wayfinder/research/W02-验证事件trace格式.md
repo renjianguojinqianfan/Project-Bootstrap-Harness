@@ -1,6 +1,6 @@
 # W02 调研笔记：验证事件 trace 格式（OpenTelemetry 对齐）
 
-- 票据：`docs/plans/wayfinder/tickets/W02-验证事件trace格式调研.md`
+- 票据：[#3 W02 验证事件 trace 格式调研](https://github.com/renjianguojinqianfan/Project-Bootstrap-Harness/issues/3)（GitHub Issues，本地票据副本已删）
 - 日期：2026-09-01；方法：一手来源优先（opentelemetry.io 规范原文、PyPI 元数据、官方/一手项目），每条论断标注出处
 - 调研对象：`harness-init validate --json` + `.harness/trace/validate-<ts>.json` 的落地形态
 

@@ -1,6 +1,6 @@
 # W01 调研：分层依赖 lint 执行工具选型
 
-- 票据：`tickets/W01-分层lint工具选型调研.md`
+- 票据：[#2 W01 分层依赖 lint 执行工具选型调研](https://github.com/renjianguojinqianfan/Project-Bootstrap-Harness/issues/2)（GitHub Issues，本地票据副本已删）
 - 日期：2026-09-01
 - 方法：逐候选查官方文档 / PyPI 元数据 / 仓库源码树，每条论断标注一手来源。
 

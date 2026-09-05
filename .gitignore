@@ -51,7 +51,11 @@ htmlcov/
 
 # Local agent tool state (personal, do not commit)
 .workbuddy/
+.mimosa/
 .mcp_test_input.jsonl
+
+# Tool caches
+.ruff_cache/
 
 # OpenCode local configuration (personal toolchain, do not commit)
 opencode.json
